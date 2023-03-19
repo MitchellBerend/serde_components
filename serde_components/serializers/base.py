@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import abc
 from typing import Any, Type, IO
 
@@ -24,7 +25,9 @@ class BaseSerializer(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @classmethod
-    def serialize_to_file(cls, record: Any, mapper: Type[BaseMapper], file_object: IO[bytes]) -> None:
+    def serialize_to_file(
+        cls, record: Any, mapper: Type[BaseMapper], file_object: IO[bytes]
+    ) -> None:
         """
         A convenience method that maps the record with the passed in mapper and
         writes it to a file object.

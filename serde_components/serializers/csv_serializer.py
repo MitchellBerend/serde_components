@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import io
 import csv
 from typing import Iterable, Type, TypeVar

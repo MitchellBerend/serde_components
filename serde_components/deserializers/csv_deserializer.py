@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import io
 import csv
 from typing import Iterable, Type, TypeVar
@@ -10,7 +11,9 @@ T = TypeVar('T')
 
 class CsvDeserializer(BaseDeserializer):
     @staticmethod
-    def deserialize(records: Iterable[T], mapper: Type[BaseMapper], data: bytes) -> Iterable[T]:
+    def deserialize(
+        records: Iterable[T], mapper: Type[BaseMapper], data: bytes
+    ) -> Iterable[T]:
         """
         This method takes in a iterable over the records and maps the data from
         a given csv.

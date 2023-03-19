@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import io
 from typing import Any, TypeVar
 
@@ -22,17 +23,18 @@ class Record:
 class Mapper(BaseMapper):
     @staticmethod
     def map_serialize(record: Any) -> bytes:
-        return str({
-            'age': record.age,
-            'name': record.name,
-        }).encode('utf-8')
+        return str(
+            {
+                'age': record.age,
+                'name': record.name,
+            }
+        ).encode('utf-8')
 
     @staticmethod
     def map_deserialize(record: Record, data: bytes) -> Record:
         _data = eval(data)
         record.age = int(_data.get('age'))
         record.name = _data.get('name')
-
 
         return record
 
@@ -47,11 +49,13 @@ def test_general_mapper():
 
     assert data == golden_data
 
+
 def test_json_serializer():
     t = Record(name='testName', age=10)
     json_data = JsonSerializer.serialize(t, Mapper).decode()
 
     assert json_data == '"{\'age\': 10, \'name\': \'testName\'}"'
+
 
 def test_json_serializer_to_file():
     t = Record(name='testName', age=10)
@@ -59,6 +63,7 @@ def test_json_serializer_to_file():
     JsonSerializer.serialize_to_file(t, Mapper, file_object)
 
     assert file_object.getvalue() == '"{\'age\': 10, \'name\': \'testName\'}"'.encode()
+
 
 def test_json_deserializer():
     t = Record(name='', age=0)
@@ -68,6 +73,7 @@ def test_json_deserializer():
 
     assert t == golden_record
 
+
 def test_json_deserializer_from_file():
     t = Record(name='', age=0)
     file_object = io.BytesIO(b'"{\'age\': 10, \'name\': \'testName\'}"')
@@ -76,11 +82,13 @@ def test_json_deserializer_from_file():
 
     assert t == golden_record
 
+
 def test_csv_serializer():
     data = [Record(name='testName', age=i) for i in range(10)]
     csv_data = CsvSerializer.serialize(data, Mapper).decode()
 
     assert csv_data == CSV_GOLDEN_DATA
+
 
 def test_csv_serializer_to_file():
     data = [Record(name='testName', age=i) for i in range(10)]
@@ -89,17 +97,19 @@ def test_csv_serializer_to_file():
 
     assert file_object.getvalue() == CSV_GOLDEN_DATA.encode('utf-8')
 
+
 def test_csv_deserializer():
     data = CSV_GOLDEN_DATA.encode('utf-8')
-    records = [Record(name='aaa', age=i+100) for i in range(10)]
+    records = [Record(name='aaa', age=i + 100) for i in range(10)]
     records = CsvDeserializer.deserialize(records, Mapper, data)
     golden_records = [Record(name='testName', age=i) for i in range(10)]
 
     assert records == golden_records
 
+
 def test_csv_deserializer_from_file():
     file_object = io.BytesIO(CSV_GOLDEN_DATA.encode('utf-8'))
-    records = [Record(name='aaa', age=i+100) for i in range(10)]
+    records = [Record(name='aaa', age=i + 100) for i in range(10)]
     records = CsvDeserializer.deserialize_from_file(records, Mapper, file_object)
     golden_records = [Record(name='testName', age=i) for i in range(10)]
 
