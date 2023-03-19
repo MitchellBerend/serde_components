@@ -8,6 +8,7 @@ on:
 jobs:
   pytest:
     name: Pytest
+    needs: black
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
