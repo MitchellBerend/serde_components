@@ -34,5 +34,5 @@ class BaseDeserializer(metaclass=abc.ABCMeta):
         A convenience method that reads data from a file object and maps it to
         the record with the passed in mapper.
         """
-        data = file_object.getvalue()
+        data = file_object.read()
         return cls.deserialize(record, mapper, data)
