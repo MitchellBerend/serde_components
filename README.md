@@ -1,9 +1,10 @@
 Table of content
+---
 
 - [Serde components](#serde-components)
 - [Implementation of custom components](#implementation-of-custom-components)
 - [Examples](#examples)
-
+- [Motivation](#motivation)
 
 # Serde components
 
@@ -96,3 +97,11 @@ if __name__ == '__main__':
 
     assert json_data == '"{\'age\': 10, \'name\': \'testName\'}"'
 ```
+
+# Motivation
+
+This serves as an example, practice and production case. In the orm world, I
+have personally come across many situations where one model needed to be mapped
+to a different structure all together. Whether this was a json object for rest a
+api or a csv file for some flatfile interface. This library aims to standardize
+the import transformation and export operations.
