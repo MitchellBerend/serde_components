@@ -60,6 +60,7 @@ same data structure as the csv serializer.
 # Examples
 
 ```python
+import ast
 import io
 from typing import Any, TypeVar
 
@@ -87,7 +88,7 @@ class Mapper(BaseMapper):
 
     @staticmethod
     def map_deserialize(record: Record, data: bytes) -> Record:
-        _data = eval(data)
+        _data = ast.literal_eval(data)
         record.age = int(_data.get('age'))
         record.name = _data.get('name')
 
