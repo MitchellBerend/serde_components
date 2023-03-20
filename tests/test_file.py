@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import ast
 import io
 from typing import Any, TypeVar
 
@@ -32,7 +33,7 @@ class Mapper(BaseMapper):
 
     @staticmethod
     def map_deserialize(record: Record, data: bytes) -> Record:
-        _data = eval(data)
+        _data = ast.literal_eval(data.decode('utf-8'))
         record.age = int(_data.get('age'))
         record.name = _data.get('name')
 
@@ -41,7 +42,7 @@ class Mapper(BaseMapper):
 
 def test_general_mapper():
     t = Record(name='testName', age=10)
-    data = eval(Mapper.map_serialize(t))
+    data = ast.literal_eval(Mapper.map_serialize(t).decode('utf-8'))
     golden_data = {
         'age': 10,
         'name': 'testName',

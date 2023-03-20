@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import ast
 import io
 import csv
 from typing import Iterable, Type, TypeVar
@@ -23,7 +24,7 @@ class CsvSerializer(BaseSerializer):
         for record in records:
             b_data: bytes = mapper.map_serialize(record)
             data = b_data.decode('utf-8')
-            mapped_data.append(eval(data))
+            mapped_data.append(ast.literal_eval(data))
 
         assert len(mapped_data) > 1
 
