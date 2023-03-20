@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/MitchellBerend/serde_components/branch/master/graph/badge.svg?token=Yh8LDG6KTt)](https://codecov.io/gh/MitchellBerend/serde_components)
+
 Table of content
 ---
 
