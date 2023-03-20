@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 from typing import Type, TypeVar
 
@@ -8,7 +9,6 @@ T = TypeVar('T')
 
 
 class JsonDeserializer(BaseDeserializer):
-
     @staticmethod
     def deserialize(record: T, mapper: Type[BaseMapper], data: bytes) -> T:
         json_data: bytes = json.loads(data).encode('utf-8')

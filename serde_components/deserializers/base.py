@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import abc
 from typing import Type, TypeVar, IO
 
@@ -26,7 +27,9 @@ class BaseDeserializer(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @classmethod
-    def deserialize_from_file(cls, record: T, mapper: Type[BaseMapper], file_object: IO[bytes]) -> T:
+    def deserialize_from_file(
+        cls, record: T, mapper: Type[BaseMapper], file_object: IO[bytes]
+    ) -> T:
         """
         A convenience method that reads data from a file object and maps it to
         the record with the passed in mapper.
