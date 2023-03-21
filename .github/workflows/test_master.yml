@@ -33,6 +33,25 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
 
+  coverage:
+    name: Coverage
+    needs: pytest
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Run Pytest with coverage
+        run: |
+          pytest --cov=./ --cov-report=xml
+      - name: Upload coverage to codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml
+
   black:
     name: Black
     runs-on: ubuntu-latest
