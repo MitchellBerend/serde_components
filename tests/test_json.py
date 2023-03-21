@@ -5,7 +5,11 @@ from typing import Any, TypeVar
 
 from serde_components.mappers import BaseMapper
 from serde_components.serializers import CsvSerializer, JsonSerializer
-from serde_components.deserializers import CsvDeserializer, JsonDeserializer
+from serde_components.deserializers import (
+    CsvDeserializer,
+    JsonDeserializer,
+    TomlDeserializer,
+)
 
 T = TypeVar('T')
 
