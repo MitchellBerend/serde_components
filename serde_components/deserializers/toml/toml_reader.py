@@ -11,11 +11,14 @@
 from typing import Any, Dict
 
 
-class InternalTomlLib:
+class InternalTomlLibReader:
     """
     This class represents the standard library's tomllib, which was added in
     3.11. Since this library supports python versions before 3.11, there needs
     to be some other implementation that can take it's place
+
+    All the methods on this class are marked as staticmethods to mimick a
+    library.
     """
 
     @staticmethod
@@ -50,15 +53,17 @@ class InternalTomlLib:
     def loads(data: str):
         sep_list = [' ', '\n']
         rv = {}
-        tokens = InternalTomlLib._read_till_sep(data, sep_list)
+        tokens = InternalTomlLibReader._read_till_sep(data, sep_list)
         placeholder: Dict[str, Any] = {}
 
         for token in tokens:
             if len(placeholder) < 3:
-                if InternalTomlLib._type_checker(token) == 'str':
-                    placeholder[InternalTomlLib._type_checker(token)] = token[1:-1]
+                if InternalTomlLibReader._type_checker(token) == 'str':
+                    placeholder[InternalTomlLibReader._type_checker(token)] = token[
+                        1:-1
+                    ]
                 else:
-                    placeholder[InternalTomlLib._type_checker(token)] = token
+                    placeholder[InternalTomlLibReader._type_checker(token)] = token
             else:
                 key = placeholder['label']
                 if 'str' in placeholder.keys():
@@ -69,10 +74,12 @@ class InternalTomlLib:
                     value = int(placeholder['int'])
                 rv[key] = value
                 placeholder = {}
-                if InternalTomlLib._type_checker(token) == 'str':
-                    placeholder[InternalTomlLib._type_checker(token)] = token[1:-1]
+                if InternalTomlLibReader._type_checker(token) == 'str':
+                    placeholder[InternalTomlLibReader._type_checker(token)] = token[
+                        1:-1
+                    ]
                 else:
-                    placeholder[InternalTomlLib._type_checker(token)] = token
+                    placeholder[InternalTomlLibReader._type_checker(token)] = token
 
         if len(placeholder) == 3:
             key = placeholder['label']

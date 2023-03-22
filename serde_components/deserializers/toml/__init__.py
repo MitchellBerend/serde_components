@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from .toml_reader import InternalTomlLib
+from .toml_reader import InternalTomlLibLoader
