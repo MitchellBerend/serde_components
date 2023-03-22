@@ -7,7 +7,7 @@ from ..mappers import BaseMapper
 try:
     import tomllib
 except ModuleNotFoundError:
-    from .toml import tomllib
+    from .toml import InternalTomlLib as tomllib
 
 
 T = TypeVar('T')
