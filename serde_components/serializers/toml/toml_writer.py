@@ -62,6 +62,9 @@ class InternalTomlLibWriter:
             if isinstance(val, str):
                 _rv = f'"{key}" = "{val}"'
                 placeholder.append(_rv)
+            elif isinstance(val, dict):
+                _rv = InternalTomlLibWriter.second_dict_parse(val)
+                placeholder.append(_rv)
             else:
                 _rv = f'"{key}" = {val}'
                 placeholder.append(_rv)
