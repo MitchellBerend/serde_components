@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from toml_writer import InternalTomlLibWriter
+from .toml_writer import InternalTomlLibWriter
