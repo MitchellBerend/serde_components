@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import ast
 import json
 from typing import Any, Type, TypeVar
 
@@ -9,7 +10,8 @@ from ..mappers import BaseMapper
 class JsonSerializer(BaseSerializer):
     @staticmethod
     def serialize(record: Any, mapper: Type[BaseMapper]) -> bytes:
-        data: bytes = mapper.map_serialize(record)
-        json_data: bytes = json.dumps(data.decode()).encode('utf-8')
+        _data: bytes = mapper.map_serialize(record)
+        data = ast.literal_eval(_data.decode('utf-8'))
+        json_data: bytes = json.dumps(data).encode('utf-8')
 
         return json_data
