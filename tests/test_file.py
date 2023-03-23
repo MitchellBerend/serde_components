@@ -55,7 +55,7 @@ def test_json_serializer():
     t = Record(name='testName', age=10)
     json_data = JsonSerializer.serialize(t, Mapper).decode()
 
-    assert json_data == '"{\'age\': 10, \'name\': \'testName\'}"'
+    assert json_data == "{\"age\": 10, \"name\": \"testName\"}"
 
 
 def test_json_serializer_to_file():
@@ -63,7 +63,7 @@ def test_json_serializer_to_file():
     file_object = io.BytesIO(b'')
     JsonSerializer.serialize_to_file(t, Mapper, file_object)
 
-    assert file_object.getvalue() == '"{\'age\': 10, \'name\': \'testName\'}"'.encode()
+    assert file_object.getvalue() == "{\"age\": 10, \"name\": \"testName\"}".encode()
 
 
 def test_json_deserializer():
