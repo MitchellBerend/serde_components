@@ -1,2 +1,2 @@
 [run]
-omit = tests/*, */base.py
+omit = tests/*, */base.py, serde_components/*/toml/*

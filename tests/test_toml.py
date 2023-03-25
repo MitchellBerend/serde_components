@@ -4,9 +4,8 @@ import io
 from typing import Any, TypeVar
 
 from serde_components.mappers import BaseMapper
-from serde_components.serializers import JsonSerializer
-
-from serde_components.deserializers import JsonDeserializer
+from serde_components.serializers import TomlSerializer
+from serde_components.deserializers import TomlDeserializer
 
 T = TypeVar('T')
 
@@ -23,12 +22,13 @@ class Record:
 class Mapper(BaseMapper):
     @staticmethod
     def map_serialize(record: Any) -> bytes:
-        return str(
-            {
-                'age': record.age,
-                'name': record.name,
-            }
-        ).encode('utf-8')
+        rv = {}
+        if record.name:
+            rv['name'] = record.name
+        if record.age:
+            rv['age'] = record.age
+
+        return str(rv).encode('utf-8')
 
     @staticmethod
     def map_deserialize(record: Record, data: bytes) -> Record:
@@ -57,84 +57,84 @@ def test_general_mapper():
     assert data == golden_data
 
 
-def test_json_serializer():
+def test_toml_serializer():
     t = Record(name='testName', age=10)
-    json_data = JsonSerializer.serialize(t, Mapper).decode()
+    toml_data = TomlSerializer.serialize(t, Mapper).decode()
 
-    assert json_data == "{\"age\": 10, \"name\": \"testName\"}"
+    assert toml_data == 'name = "testName"\nage = 10\n'
 
 
-def test_json_serializer_to_file1():
-    t = Record(name='TestFileName', age=100)
+def test_toml_serializer_to_file1():
+    t = Record(name='TestNameToml', age=10)
     file_object = io.BytesIO(b'')
-    JsonSerializer.serialize_to_file(t, Mapper, file_object)
+    TomlSerializer.serialize_to_file(t, Mapper, file_object)
 
-    with open('tests/data/json/record1.json', 'rb') as golden_file_object:
+    with open('tests/data/toml/record1.toml', 'rb') as golden_file_object:
         golden_bytes = golden_file_object.read()[:-1]
 
     assert file_object.getvalue() == golden_bytes
 
 
-def test_json_serializer_to_file2():
+def test_toml_serializer_to_file2():
     t = Record(name=None, age=None)
     file_object = io.BytesIO(b'')
-    JsonSerializer.serialize_to_file(t, Mapper, file_object)
-    golden_bytes = b'{"age": null, "name": null}'
+    TomlSerializer.serialize_to_file(t, Mapper, file_object)
+    golden_bytes = b''
 
     assert file_object.getvalue() == golden_bytes
 
 
-def test_json_serializer_to_file3():
-    t = Record(name=100, age='TestFileName')
+def test_toml_serializer_to_file3():
+    t = Record(name=100, age='TestNameToml')
     file_object = io.BytesIO(b'')
-    JsonSerializer.serialize_to_file(t, Mapper, file_object)
+    TomlSerializer.serialize_to_file(t, Mapper, file_object)
 
-    with open('tests/data/json/record3.json', 'rb') as golden_file_object:
+    with open('tests/data/toml/record3.toml', 'rb') as golden_file_object:
         golden_bytes = golden_file_object.read()[:-1]
 
     assert file_object.getvalue() == golden_bytes
 
 
-def test_json_deserializer():
+def test_toml_deserializer():
     t = Record(name='', age=0)
-    json_data = b'"{\'age\': 10, \'name\': \'testName\'}"'
-    JsonDeserializer.deserialize(t, Mapper, json_data)
+    toml_data = b'age = 10\nname = "testName"\n'
+    TomlDeserializer.deserialize(t, Mapper, toml_data)
     golden_record = Record(name='testName', age=10)
 
     assert t == golden_record
 
 
-def test_json_deserializer_from_filebuffer():
+def test_toml_deserializer_from_filebuffer():
     t = Record(name='', age=0)
-    file_object = io.BytesIO(b'"{\'age\': 10, \'name\': \'testName\'}"')
-    JsonDeserializer.deserialize_from_file(t, Mapper, file_object)
+    file_object = io.BytesIO(b'age = 10\nname = "testName"\n')
+    TomlDeserializer.deserialize_from_file(t, Mapper, file_object)
     golden_record = Record(name='testName', age=10)
 
     assert t == golden_record
 
 
-def test_json_deserializer_actual_file1():
-    with open('tests/data/json/record1.json', 'rb') as file_object:
+def test_toml_deserializer_actual_file1():
+    with open('tests/data/toml/record1.toml', 'rb') as file_object:
         record = Record(name='', age=0)
-        JsonDeserializer.deserialize_from_file(record, Mapper, file_object)
+        TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name='TestFileName', age=100)
 
     assert record, golden_record
 
 
-def test_json_deserializer_actual_file2():
-    with open('tests/data/json/record2.json', 'rb') as file_object:
+def test_toml_deserializer_actual_file2():
+    with open('tests/data/toml/record2.toml', 'rb') as file_object:
         record = Record(name='', age=0)
-        JsonDeserializer.deserialize_from_file(record, Mapper, file_object)
+        TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name=None, age=None)
 
     assert record, golden_record
 
 
-def test_json_deserializer_actual_file3():
-    with open('tests/data/json/record3.json', 'rb') as file_object:
+def test_toml_deserializer_actual_file3():
+    with open('tests/data/toml/record3.toml', 'rb') as file_object:
         record = Record(name='', age=0)
-        JsonDeserializer.deserialize_from_file(record, Mapper, file_object)
+        TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name=10, age='TestFileName')
 
     assert record, golden_record
