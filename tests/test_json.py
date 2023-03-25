@@ -68,7 +68,7 @@ def test_json_serializer_to_file1():
     file_object = io.BytesIO(b'')
     JsonSerializer.serialize_to_file(t, Mapper, file_object)
 
-    with open('tests/test_files/json/record1.json', 'rb') as golden_file_object:
+    with open('tests/data/json/record1.json', 'rb') as golden_file_object:
         golden_bytes = golden_file_object.read()[:-1]
 
     assert file_object.getvalue() == golden_bytes
@@ -88,7 +88,7 @@ def test_json_serializer_to_file3():
     file_object = io.BytesIO(b'')
     JsonSerializer.serialize_to_file(t, Mapper, file_object)
 
-    with open('tests/test_files/json/record3.json', 'rb') as golden_file_object:
+    with open('tests/data/json/record3.json', 'rb') as golden_file_object:
         golden_bytes = golden_file_object.read()[:-1]
 
     assert file_object.getvalue() == golden_bytes
@@ -113,7 +113,7 @@ def test_json_deserializer_from_filebuffer():
 
 
 def test_json_deserializer_actual_file1():
-    with open('tests/test_files/json/record1.json', 'rb') as file_object:
+    with open('tests/data/json/record1.json', 'rb') as file_object:
         record = Record(name='', age=0)
         JsonDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name='TestFileName', age=100)
@@ -122,7 +122,7 @@ def test_json_deserializer_actual_file1():
 
 
 def test_json_deserializer_actual_file2():
-    with open('tests/test_files/json/record2.json', 'rb') as file_object:
+    with open('tests/data/json/record2.json', 'rb') as file_object:
         record = Record(name='', age=0)
         JsonDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name=None, age=None)
@@ -131,7 +131,7 @@ def test_json_deserializer_actual_file2():
 
 
 def test_json_deserializer_actual_file3():
-    with open('tests/test_files/json/record3.json', 'rb') as file_object:
+    with open('tests/data/json/record3.json', 'rb') as file_object:
         record = Record(name='', age=0)
         JsonDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name=10, age='TestFileName')
