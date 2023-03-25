@@ -9,8 +9,6 @@ from serde_components.deserializers import CsvDeserializer, JsonDeserializer
 
 T = TypeVar('T')
 
-CSV_GOLDEN_DATA = '"age","name"\n"0","testName"\n"1","testName"\n"2","testName"\n"3","testName"\n"4","testName"\n"5","testName"\n"6","testName"\n"7","testName"\n"8","testName"\n"9","testName"\n'
-
 
 class Record:
     def __init__(self, name, age):
@@ -34,7 +32,14 @@ class Mapper(BaseMapper):
     @staticmethod
     def map_deserialize(record: Record, data: bytes) -> Record:
         _data = ast.literal_eval(data.decode('utf-8'))
-        record.age = _data.get('age')
+        age = _data.get('age')
+        if isinstance(age, str):
+            try:
+                record.age = int(age)
+            except:
+                record.age = age
+        if isinstance(age, int):
+            record.age = age
         record.name = _data.get('name')
 
         return record
@@ -137,20 +142,25 @@ def test_json_deserializer_actual_file3():
 def test_csv_serializer():
     data = [Record(name='testName', age=i) for i in range(10)]
     csv_data = CsvSerializer.serialize(data, Mapper).decode()
+    with open('tests/test_files/csv/record1.csv', 'r') as golden_file_object:
+        golden_bytes = golden_file_object.read()[:-1]
 
-    assert csv_data == CSV_GOLDEN_DATA
+    assert csv_data == golden_bytes
 
 
 def test_csv_serializer_to_file():
     data = [Record(name='testName', age=i) for i in range(10)]
     file_object = io.BytesIO(b'')
     CsvSerializer.serialize_to_file(data, Mapper, file_object)
+    with open('tests/test_files/csv/record1.csv', 'rb') as golden_file_object:
+        golden_bytes = golden_file_object.read()[:-1]
 
-    assert file_object.getvalue() == CSV_GOLDEN_DATA.encode('utf-8')
+    assert file_object.getvalue() == golden_bytes
 
 
 def test_csv_deserializer():
-    data = CSV_GOLDEN_DATA.encode('utf-8')
+    with open('tests/test_files/csv/record2.csv', 'rb') as golden_file_object:
+        data = golden_file_object.read()[:-1]
     records = [Record(name='aaa', age=i + 100) for i in range(10)]
     records = CsvDeserializer.deserialize(records, Mapper, data)
     golden_records = [Record(name='testName', age=i) for i in range(10)]
@@ -159,7 +169,9 @@ def test_csv_deserializer():
 
 
 def test_csv_deserializer_from_filebuffer():
-    file_object = io.BytesIO(CSV_GOLDEN_DATA.encode('utf-8'))
+    with open('tests/test_files/csv/record2.csv', 'rb') as golden_file_object:
+        data = golden_file_object.read()[:-1]
+    file_object = io.BytesIO(data)
     records = [Record(name='aaa', age=i + 100) for i in range(10)]
     records = CsvDeserializer.deserialize_from_file(records, Mapper, file_object)
     golden_records = [Record(name='testName', age=i) for i in range(10)]
