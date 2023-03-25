@@ -64,18 +64,18 @@ def test_json_serializer_to_file1():
     JsonSerializer.serialize_to_file(t, Mapper, file_object)
 
     with open('tests/test_files/json/record1.json', 'rb') as golden_file_object:
-        golen_bytes = golden_file_object.read()[:-1]
+        golden_bytes = golden_file_object.read()[:-1]
 
-    assert file_object.getvalue() == golen_bytes
+    assert file_object.getvalue() == golden_bytes
 
 
 def test_json_serializer_to_file2():
     t = Record(name=None, age=None)
     file_object = io.BytesIO(b'')
     JsonSerializer.serialize_to_file(t, Mapper, file_object)
-    golen_bytes = b'{"age": null, "name": null}'
+    golden_bytes = b'{"age": null, "name": null}'
 
-    assert file_object.getvalue() == golen_bytes
+    assert file_object.getvalue() == golden_bytes
 
 
 def test_json_serializer_to_file3():
@@ -84,9 +84,9 @@ def test_json_serializer_to_file3():
     JsonSerializer.serialize_to_file(t, Mapper, file_object)
 
     with open('tests/test_files/json/record3.json', 'rb') as golden_file_object:
-        golen_bytes = golden_file_object.read()[:-1]
+        golden_bytes = golden_file_object.read()[:-1]
 
-    assert file_object.getvalue() == golen_bytes
+    assert file_object.getvalue() == golden_bytes
 
 
 def test_json_deserializer():
