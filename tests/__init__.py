@@ -1,2 +1,3 @@
 # -*- coding: utf-8 -*-
-from . import test_file
+from . import test_csv
+from . import test_json
