@@ -5,8 +5,7 @@ from typing import Any, TypeVar
 
 from serde_components.mappers import BaseMapper
 from serde_components.serializers import XmlSerializer
-
-# from serde_components.deserializers import XmlDeserializer
+from serde_components.deserializers import XmlDeserializer
 
 T = TypeVar('T')
 
@@ -98,46 +97,38 @@ def test_xml_serializer_to_file3():
     assert file_object.getvalue() == golden_bytes
 
 
-# def test_xml_deserializer():
-#    t = Record(name='', age=0)
-#    xml_data = b'age = 10\nname = "testName"\n'
-#    XmlDeserializer.deserialize(t, Mapper, xml_data)
-#    golden_record = Record(name='testName', age=10)
-#
-#    assert t == golden_record
-#
-#
-# def test_xml_deserializer_from_filebuffer():
-#    t = Record(name='', age=0)
-#    file_object = io.BytesIO(b'age = 10\nname = "testName"\n')
-#    XmlDeserializer.deserialize_from_file(t, Mapper, file_object)
-#    golden_record = Record(name='testName', age=10)
-#
-#    assert t == golden_record
-#
-#
-# def test_xml_deserializer_actual_file1():
-#    with open('tests/data/xml/record1.xml', 'rb') as file_object:
-#        record = Record(name='', age=0)
-#        XmlDeserializer.deserialize_from_file(record, Mapper, file_object)
-#        golden_record = Record(name='TestFileName', age=100)
-#
-#    assert record, golden_record
-#
-#
-# def test_xml_deserializer_actual_file2():
-#    with open('tests/data/xml/record2.xml', 'rb') as file_object:
-#        record = Record(name='', age=0)
-#        XmlDeserializer.deserialize_from_file(record, Mapper, file_object)
-#        golden_record = Record(name=None, age=None)
-#
-#    assert record, golden_record
-#
-#
-# def test_xml_deserializer_actual_file3():
-#    with open('tests/data/xml/record3.xml', 'rb') as file_object:
-#        record = Record(name='', age=0)
-#        XmlDeserializer.deserialize_from_file(record, Mapper, file_object)
-#        golden_record = Record(name=10, age='TestFileName')
-#
-#    assert record, golden_record
+def test_xml_deserializer_from_filebuffer():
+    t = Record(name='', age=0)
+    xml_data = b'<Root>\n  <age>10</age>\n  <name>testName</name>\n  <test/>\n</Root>\n'
+    file_object = io.BytesIO(xml_data)
+    XmlDeserializer.deserialize_from_file(t, Mapper, file_object)
+    golden_record = Record(name='testName', age=10)
+
+    assert t == golden_record
+
+
+def test_xml_deserializer_actual_file1():
+    with open('tests/data/xml/record1.xml', 'rb') as file_object:
+        record = Record(name='', age=0)
+        XmlDeserializer.deserialize_from_file(record, Mapper, file_object)
+        golden_record = Record(name='TestNameXml', age=10)
+
+    assert record, golden_record
+
+
+def test_xml_deserializer_actual_file2():
+    with open('tests/data/xml/record2.xml', 'rb') as file_object:
+        record = Record(name='', age=0)
+        XmlDeserializer.deserialize_from_file(record, Mapper, file_object)
+        golden_record = Record(name=None, age=None)
+
+    assert record, golden_record
+
+
+def test_xml_deserializer_actual_file3():
+    with open('tests/data/xml/record3.xml', 'rb') as file_object:
+        record = Record(name='', age=0)
+        XmlDeserializer.deserialize_from_file(record, Mapper, file_object)
+        golden_record = Record(name=100, age='TestNameXml')
+
+    assert record, golden_record
