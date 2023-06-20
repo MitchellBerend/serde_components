@@ -8,7 +8,7 @@
 ################################################################################
 
 
-from typing import List
+from typing import Any, Dict, List
 
 from .tokenizer import Tokenizer
 
@@ -21,16 +21,23 @@ class XmlReader:
     @staticmethod
     def loads(data: str) -> str:
         tokens = Tokenizer.tokenize(data)
+        rv: Dict[str, Any] = {}
         chain: List[str] = []
         depth = 0
         for token in tokens:
             if token.type == 'open_tag':
                 depth += 1
-                chain.append(token.content)
+                chain.append(token.content.replace('<', '').replace('>', ''))
             elif token.type == 'close_tag':
                 if chain and chain[-1] == token.content.replace('/', ''):
                     depth -= 1
                     chain.pop()
             else:
-                # Its text
-                pass
+                val = '{}'
+                _access = (
+                    '''rv[''' f'''\'{"']['".join(word for word in chain)}'] = {val}'''
+                )
+
+                exec(_access)
+
+        return str(rv)
