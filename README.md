@@ -48,7 +48,6 @@ serializers or deserializers. The common pattern in this library is that a
 (de)serializer will take in a record, mapper and maybe some data, which then
 will produce the desired outcome.
 
-
 This way changing from json to toml will be a simple serializer swap without
 touching the rest of the code.
 
@@ -56,13 +55,20 @@ Caution should be taken when the data structure that the serializer or
 deserializer produes is not the same. A json serializer will not produce the
 same data structure as the csv serializer.
 
+This library does not contain (de)serializers that depend on non standard
+library provided modules and that is a conscious choice. It should be up to the
+consumer of this library to decide if they want to use one dependency over
+another (or none at all). This does however mean that a lot of common file types
+are not supported out of the box.
+
+
 
 # Examples
 
 ```python
 import ast
 import io
-from typing import Any, TypeVar
+from typing import Any
 
 from serde_components.mappers import BaseMapper
 from serde_components.serializers import JsonSerializer

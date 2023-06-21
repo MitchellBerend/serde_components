@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import ast
 import io
+import sys
 from typing import Any, TypeVar
 
+import pytest
+
 from serde_components.mappers import BaseMapper
-from serde_components.serializers import TomlSerializer
 from serde_components.deserializers import TomlDeserializer
 
 T = TypeVar('T')
@@ -57,66 +59,44 @@ def test_general_mapper():
     assert data == golden_data
 
 
-def test_toml_serializer():
-    t = Record(name='testName', age=10)
-    toml_data = TomlSerializer.serialize(t, Mapper).decode()
-
-    assert toml_data == 'name = "testName"\nage = 10\n'
-
-
-def test_toml_serializer_to_file1():
-    t = Record(name='TestNameToml', age=10)
-    file_object = io.BytesIO(b'')
-    TomlSerializer.serialize_to_file(t, Mapper, file_object)
-
-    with open('tests/data/toml/record1.toml', 'rb') as golden_file_object:
-        golden_bytes = golden_file_object.read()[:-1]
-
-    assert file_object.getvalue() == golden_bytes
-
-
-def test_toml_serializer_to_file2():
-    t = Record(name=None, age=None)
-    file_object = io.BytesIO(b'')
-    TomlSerializer.serialize_to_file(t, Mapper, file_object)
-    golden_bytes = b''
-
-    assert file_object.getvalue() == golden_bytes
-
-
-def test_toml_serializer_to_file3():
-    t = Record(name=100, age='TestNameToml')
-    file_object = io.BytesIO(b'')
-    TomlSerializer.serialize_to_file(t, Mapper, file_object)
-
-    with open('tests/data/toml/record3.toml', 'rb') as golden_file_object:
-        golden_bytes = golden_file_object.read()[:-1]
-
-    assert file_object.getvalue() == golden_bytes
-
-
 def test_toml_deserializer():
     t = Record(name='', age=0)
     toml_data = b'age = 10\nname = "testName"\n'
-    TomlDeserializer.deserialize(t, Mapper, toml_data)
-    golden_record = Record(name='testName', age=10)
+    if sys.version_info.minor < 11:
+        with pytest.raises(ImportError):
+            TomlDeserializer.deserialize(t, Mapper, toml_data)
+    else:
+        TomlDeserializer.deserialize(t, Mapper, toml_data)
+        golden_record = Record(name='testName', age=10)
 
-    assert t == golden_record
+        assert t == golden_record
 
 
 def test_toml_deserializer_from_filebuffer():
     t = Record(name='', age=0)
     file_object = io.BytesIO(b'age = 10\nname = "testName"\n')
-    TomlDeserializer.deserialize_from_file(t, Mapper, file_object)
-    golden_record = Record(name='testName', age=10)
+    if sys.version_info.minor < 11:
+        with pytest.raises(ImportError):
+            TomlDeserializer.deserialize_from_file(t, Mapper, file_object)
+    else:
+        TomlDeserializer.deserialize_from_file(t, Mapper, file_object)
+        golden_record = Record(name='testName', age=10)
 
-    assert t == golden_record
+        assert t == golden_record
 
 
 def test_toml_deserializer_actual_file1():
     with open('tests/data/toml/record1.toml', 'rb') as file_object:
         record = Record(name='', age=0)
-        TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
+        if sys.version_info.minor < 11:
+            with pytest.raises(ImportError):
+                TomlDeserializer.deserialize_from_file(
+                    record,
+                    Mapper,
+                    file_object,
+                )
+        else:
+            TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name='TestFileName', age=100)
 
     assert record, golden_record
@@ -125,7 +105,15 @@ def test_toml_deserializer_actual_file1():
 def test_toml_deserializer_actual_file2():
     with open('tests/data/toml/record2.toml', 'rb') as file_object:
         record = Record(name='', age=0)
-        TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
+        if sys.version_info.minor < 11:
+            with pytest.raises(ImportError):
+                TomlDeserializer.deserialize_from_file(
+                    record,
+                    Mapper,
+                    file_object,
+                )
+        else:
+            TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name=None, age=None)
 
     assert record, golden_record
@@ -134,7 +122,15 @@ def test_toml_deserializer_actual_file2():
 def test_toml_deserializer_actual_file3():
     with open('tests/data/toml/record3.toml', 'rb') as file_object:
         record = Record(name='', age=0)
-        TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
+        if sys.version_info.minor < 11:
+            with pytest.raises(ImportError):
+                TomlDeserializer.deserialize_from_file(
+                    record,
+                    Mapper,
+                    file_object,
+                )
+        else:
+            TomlDeserializer.deserialize_from_file(record, Mapper, file_object)
         golden_record = Record(name=10, age='TestFileName')
 
     assert record, golden_record
