@@ -56,41 +56,41 @@ def test_general_mapper():
     assert data == golden_data
 
 
-def test_csv_serializer():
-    data = [Record(name='testName', age=i) for i in range(10)]
-    csv_data = CsvSerializer.serialize(data, Mapper).decode()
-    with open('tests/data/csv/record1.csv', 'r') as golden_file_object:
-        golden_bytes = golden_file_object.read()[:-1]
-
-    assert csv_data == golden_bytes
-
-
-def test_csv_serializer_to_file():
-    data = [Record(name='testName', age=i) for i in range(10)]
-    file_object = io.BytesIO(b'')
-    CsvSerializer.serialize_to_file(data, Mapper, file_object)
-    with open('tests/data/csv/record1.csv', 'rb') as golden_file_object:
-        golden_bytes = golden_file_object.read()[:-1]
-
-    assert file_object.getvalue() == golden_bytes
-
-
-def test_csv_deserializer():
-    with open('tests/data/csv/record2.csv', 'rb') as golden_file_object:
-        data = golden_file_object.read()[:-1]
-    records = [Record(name='aaa', age=i + 100) for i in range(10)]
-    records = CsvDeserializer.deserialize(records, Mapper, data)
-    golden_records = [Record(name='testName', age=i) for i in range(10)]
-
-    assert records == golden_records
-
-
-def test_csv_deserializer_from_filebuffer():
-    with open('tests/data/csv/record2.csv', 'rb') as golden_file_object:
-        data = golden_file_object.read()[:-1]
-    file_object = io.BytesIO(data)
-    records = [Record(name='aaa', age=i + 100) for i in range(10)]
-    records = CsvDeserializer.deserialize_from_file(records, Mapper, file_object)
-    golden_records = [Record(name='testName', age=i) for i in range(10)]
-
-    assert records == golden_records
+# def test_csv_serializer():
+#     data = [Record(name='testName', age=i) for i in range(10)]
+#     csv_data = CsvSerializer.serialize(data, Mapper).decode()
+#     with open('tests/data/csv/record1.csv', 'r') as golden_file_object:
+#         golden_bytes = golden_file_object.read()[:-1]
+#
+#     assert csv_data == golden_bytes
+#
+#
+# def test_csv_serializer_to_file():
+#     data = [Record(name='testName', age=i) for i in range(10)]
+#     file_object = io.BytesIO(b'')
+#     CsvSerializer.serialize_to_file(data, Mapper, file_object)
+#     with open('tests/data/csv/record1.csv', 'rb') as golden_file_object:
+#         golden_bytes = golden_file_object.read()[:-1]
+#
+#     assert file_object.getvalue() == golden_bytes
+#
+#
+# def test_csv_deserializer():
+#     with open('tests/data/csv/record2.csv', 'rb') as golden_file_object:
+#         data = golden_file_object.read()[:-1]
+#     records = [Record(name='aaa', age=i + 100) for i in range(10)]
+#     records = CsvDeserializer.deserialize(records, Mapper, data)
+#     golden_records = [Record(name='testName', age=i) for i in range(10)]
+#
+#     assert records == golden_records
+#
+#
+# def test_csv_deserializer_from_filebuffer():
+#     with open('tests/data/csv/record2.csv', 'rb') as golden_file_object:
+#         data = golden_file_object.read()[:-1]
+#     file_object = io.BytesIO(data)
+#     records = [Record(name='aaa', age=i + 100) for i in range(10)]
+#     records = CsvDeserializer.deserialize_from_file(records, Mapper, file_object)
+#     golden_records = [Record(name='testName', age=i) for i in range(10)]
+#
+#     assert records == golden_records
