@@ -3,14 +3,15 @@ import ast
 import io
 from typing import Any, TypeVar
 
+from serde_components.deserializers import CsvDeserializer
 from serde_components.mappers import BaseMapper
-from serde_components.serializers import CsvSerializer, JsonSerializer
-from serde_components.deserializers import CsvDeserializer, JsonDeserializer
+from serde_components.record.base import BaseRecord
+from serde_components.serializers import CsvSerializer
 
 T = TypeVar('T')
 
 
-class Record:
+class Record(BaseRecord):
     def __init__(self, name, age):
         self.name = name
         self.age = age
@@ -36,7 +37,7 @@ class Mapper(BaseMapper):
         if isinstance(age, str):
             try:
                 record.age = int(age)
-            except:
+            except:  # noqa
                 record.age = age
         if isinstance(age, int):
             record.age = age
@@ -90,7 +91,11 @@ def test_csv_deserializer_from_filebuffer():
         data = golden_file_object.read()[:-1]
     file_object = io.BytesIO(data)
     records = [Record(name='aaa', age=i + 100) for i in range(10)]
-    records = CsvDeserializer.deserialize_from_file(records, Mapper, file_object)
+    records = CsvDeserializer.deserialize_from_file(
+        records,
+        Mapper,
+        file_object,
+    )
     golden_records = [Record(name='testName', age=i) for i in range(10)]
 
     assert records == golden_records

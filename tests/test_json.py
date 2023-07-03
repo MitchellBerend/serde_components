@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 import ast
 import io
-from typing import Any, TypeVar
-
-from serde_components.mappers import BaseMapper
-from serde_components.serializers import JsonSerializer
+from typing import Any
 
 from serde_components.deserializers import JsonDeserializer
+from serde_components.mappers import BaseMapper
+from serde_components.record.base import BaseRecord
+from serde_components.serializers import JsonSerializer
 
-T = TypeVar('T')
 
-
-class Record:
+class Record(BaseRecord):
     def __init__(self, name, age):
         self.name = name
         self.age = age
@@ -37,7 +35,7 @@ class Mapper(BaseMapper):
         if isinstance(age, str):
             try:
                 record.age = int(age)
-            except:
+            except:  # noqa
                 record.age = age
         if isinstance(age, int):
             record.age = age
