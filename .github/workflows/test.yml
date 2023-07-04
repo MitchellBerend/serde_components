@@ -69,3 +69,15 @@ jobs:
         run: |
           pip install black
           black -S --check .
+
+  mypy:
+    name: Mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update pip
+        run: pip install --upgrade pip
+      - name: Setup mypy
+        run: pip install mypy==v0.991
+      - name: Run mypy
+        run: mypy serde_components/

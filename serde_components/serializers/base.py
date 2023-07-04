@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import abc
-from typing import Any, Type, IO
+from typing import Type, IO
 
 from ..mappers import BaseMapper
+from ..record import BaseRecord as R
 
 
 class BaseSerializer(metaclass=abc.ABCMeta):
@@ -17,7 +18,7 @@ class BaseSerializer(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def serialize(record: Any, mapper: Type[BaseMapper]) -> bytes:
+    def serialize(record: R, mapper: Type[BaseMapper]) -> bytes:
         """
         This method is the main way to interact with an instance of a class
         derived from this base.
@@ -26,7 +27,7 @@ class BaseSerializer(metaclass=abc.ABCMeta):
 
     @classmethod
     def serialize_to_file(
-        cls, record: Any, mapper: Type[BaseMapper], file_object: IO[bytes]
+        cls, record: R, mapper: Type[BaseMapper], file_object: IO[bytes]
     ) -> None:
         """
         A convenience method that maps the record with the passed in mapper and

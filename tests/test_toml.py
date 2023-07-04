@@ -8,11 +8,13 @@ import pytest
 
 from serde_components.mappers import BaseMapper
 from serde_components.deserializers import TomlDeserializer
+from serde_components.record import BaseRecord
+
 
 T = TypeVar('T')
 
 
-class Record:
+class Record(BaseRecord):
     def __init__(self, name, age):
         self.name = name
         self.age = age
@@ -39,7 +41,7 @@ class Mapper(BaseMapper):
         if isinstance(age, str):
             try:
                 record.age = int(age)
-            except:
+            except:  # noqa
                 record.age = age
         if isinstance(age, int):
             record.age = age

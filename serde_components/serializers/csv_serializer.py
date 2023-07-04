@@ -2,23 +2,25 @@
 import ast
 import io
 import csv
-from typing import Iterable, Type, TypeVar
+from typing import IO, Type
+from typing import Iterable as Iter
 
 from .base import BaseSerializer
 from ..mappers import BaseMapper
-
-T = TypeVar('T')
+from ..record import BaseRecord as R
 
 
 class CsvSerializer(BaseSerializer):
     @staticmethod
-    def serialize(records: Iterable[T], mapper: Type[BaseMapper]) -> bytes:
+    def serialize(records: Iter[R], mapper: Type[BaseMapper]) -> bytes:  # type: ignore
         """
         This method takes in a iterable over the records and maps the data from
-        a to a csv format.
+        a to a csv format. It takes an iterable since a csv will contain rows
+        which should correspond with a single record.
 
-        It takes an iterable since a csv will contain rows which should
-        correspond with a single record.
+        This class takes a different type than the BaseSerializer, it does not
+        make sense for a csv serializer to only map a single record. For this
+        reason the type checking is ignored.
         """
         mapped_data = []
         for record in records:
@@ -37,3 +39,15 @@ class CsvSerializer(BaseSerializer):
             writer.writerow(row)
 
         return file_object.getvalue().encode('utf-8')
+
+    @classmethod
+    def serialize_to_file(  # type: ignore
+        cls, record: Iter[R], mapper: Type[BaseMapper], file_object: IO[bytes]
+    ) -> None:
+        """
+        This method only gets overwriten to change the accepted types.
+        """
+        r = record
+        m = mapper
+        f = file_object
+        return super().serialize_to_file(r, m, f)  # type: ignore
