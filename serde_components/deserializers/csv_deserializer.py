@@ -32,9 +32,9 @@ class CsvDeserializer(BaseDeserializer):
         return records
 
     @classmethod
-    def deserialize_from_file(
+    def deserialize_from_file(  # type: ignore
         cls, record: Iter[R], mapper: Type[BaseMapper], file_object: IO[bytes]
-    ) -> R:
+    ) -> Iter[R]:
         """
         This method only gets overwriten to change the accepted types.
         """

@@ -10,7 +10,7 @@ PYTHON_VERSION_ERROR = 'Your python version does not support this component'
 
 
 if sys.version_info.minor >= 11:
-    import tomllib
+    import tomllib  # type: ignore
 
 
 class TomlDeserializer(BaseDeserializer):
