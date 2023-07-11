@@ -61,8 +61,6 @@ consumer of this library to decide if they want to use one dependency over
 another (or none at all). This does however mean that a lot of common file types
 are not supported out of the box.
 
-
-
 # Examples
 
 ```python
@@ -71,9 +69,11 @@ import io
 from typing import Any
 
 from serde_components.mappers import BaseMapper
+from serde_components.record import BaseRecord
 from serde_components.serializers import JsonSerializer
 
-class Record:
+
+class Record(BaseRecord):
     def __init__(self, name: str, age: int):
         self.name = name
         self.age = age
@@ -82,9 +82,12 @@ class Record:
         return self.age == other.age and self.name == other.name
 
 
+# This mapper does not take BaseRecord, since this mapper is specific to the
+# concrete Record defined above. It's probably a good idea to give your own 
+# implementations a proper name.
 class Mapper(BaseMapper):
     @staticmethod
-    def map_serialize(record: Any) -> bytes:
+    def map_serialize(record: Record) -> bytes:
         return str(
             {
                 'age': record.age,
