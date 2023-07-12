@@ -70,7 +70,7 @@ from typing import Any
 
 from serde_components.mappers import BaseMapper
 from serde_components.record import BaseRecord
-from serde_components.serializers import JsonSerializer
+from serde_components.serializers import JsonSerializer, BaseSerializer
 
 
 class Record(BaseRecord):
@@ -103,11 +103,61 @@ class Mapper(BaseMapper):
 
         return record
 
-if __name__ == '__main__':
-    record = Record(name='testName', age=10)
-    json_data = JsonSerializer.serialize(record, Mapper).decode()
+# Since the CsvSerializer only produces comma separated data, this exmaple
+# also includes a TsvSerializer.
+class TsvSerializer(BaseSerializer):
+    @staticmethod
+    def serialize(records: Iter[R], mapper: Type[BaseMapper]) -> bytes:
+        """
+        This method takes in a iterable over the records and maps the data from
+        a to a tsv format. It takes an iterable since a tsv will contain rows
+        which should correspond with a single record.
 
-    assert json_data == '"{\'age\': 10, \'name\': \'testName\'}"'
+        This class takes a different type than the BaseSerializer, it does not
+        make sense for a tsv serializer to only map a single record. For this
+        reason the type checking is ignored.
+        """
+
+        mapped_data = []
+        for record in records:
+            b_data: bytes = mapper.map_serialize(record)
+            data = b_data.decode('utf-8')
+            mapped_data.append(ast.literal_eval(data))
+
+        assert len(mapped_data) > 1
+
+        keys = list(mapped_data[0].keys())
+        file_object = io.StringIO('')
+
+        writer = csv.DictWriter(
+            file_object,
+            fieldnames=keys, 
+            delimiter='t',
+            dialect='unix',
+        )
+        writer.writeheader()
+        for row in mapped_data:
+            writer.writerow(row)
+
+        return file_object.getvalue().encode('utf-8')
+
+
+if __name__ == '__main__':
+    records [
+        Record(name='testName', age=index) for index in range(10)
+    ]
+
+    # Since these components are made to be almost freely interchangable, this
+    # all works without any problems. The only difference exist in the file
+    # format that needs to be exported to. It does not make sense to have a
+    # single csv or tsv file for every record. Since mappers only map one record
+    # to a certain data structure, the serializer needs to handle more than one
+    # case.
+    json_data = JsonSerializer.serialize(records[0], Mapper).decode()
+    tsv_data = TsvSerializer.serialize(records, Mapper).decode()
+    csv_data = CsvSerializer.serialize(records, Mapper).decode()
+
+    assert json_data == '"{\'age\': 1, \'name\': \'testName\'}"'
 ```
 
 # Motivation
