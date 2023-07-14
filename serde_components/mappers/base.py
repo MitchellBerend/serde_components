@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import abc
+from typing import Generic
 
-from ..record import BaseRecord
+from ..record import Record
 
 
-class BaseMapper(metaclass=abc.ABCMeta):
+class BaseMapper(abc.ABC, Generic[Record]):
     """
     This class defines the interface that is required in order to use a derived
     class as a mapper object. It is technically possible to implement a class
@@ -14,10 +15,10 @@ class BaseMapper(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def map_serialize(record: BaseRecord) -> bytes:
+    def map_serialize(record: Record) -> bytes:
         raise NotImplementedError
 
     @staticmethod
     @abc.abstractmethod
-    def map_deserialize(record: BaseRecord, data: bytes) -> BaseRecord:
+    def map_deserialize(record: Record, data: bytes) -> Record:
         raise NotImplementedError

@@ -25,7 +25,7 @@ class Record(BaseRecord):
 
 class Mapper(BaseMapper):
     @staticmethod
-    def map_serialize(record: Any) -> bytes:
+    def map_serialize(record: Record) -> bytes:  # type: ignore
         rv = {}
         if record.name:
             rv['name'] = record.name
@@ -35,7 +35,7 @@ class Mapper(BaseMapper):
         return str(rv).encode('utf-8')
 
     @staticmethod
-    def map_deserialize(record: Record, data: bytes) -> Record:
+    def map_deserialize(record: Record, data: bytes) -> Record:  # type: ignore
         _data = ast.literal_eval(data.decode('utf-8'))
         age = _data.get('age')
         if isinstance(age, str):

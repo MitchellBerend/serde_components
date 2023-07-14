@@ -20,7 +20,7 @@ class Record(BaseRecord):
 
 class Mapper(BaseMapper):
     @staticmethod
-    def map_serialize(record: Any) -> bytes:
+    def map_serialize(record: Record) -> bytes:  # type: ignore
         return str(
             {
                 'age': record.age,
@@ -29,7 +29,7 @@ class Mapper(BaseMapper):
         ).encode('utf-8')
 
     @staticmethod
-    def map_deserialize(record: Record, data: bytes) -> Record:
+    def map_deserialize(record: Record, data: bytes) -> Record:  # type: ignore
         _data = ast.literal_eval(data.decode('utf-8'))
         age = _data.get('age')
         if isinstance(age, str):

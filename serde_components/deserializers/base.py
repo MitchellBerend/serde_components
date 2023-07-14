@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import abc
-from typing import Type, IO
+from typing import Generic, IO, Iterable, Type
 
 from ..mappers import BaseMapper
-from ..record import BaseRecord as R
+from ..record import Record
 
 
-class BaseDeserializer(metaclass=abc.ABCMeta):
+class BaseDeserializer(abc.ABC, Generic[Record]):
     """
     This base class defines the interface that all deserializers must
     implement. All methods that require implementation are marked with the
@@ -18,7 +18,9 @@ class BaseDeserializer(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def deserialize(record: R, mapper: Type[BaseMapper], data: bytes) -> R:
+    def deserialize(
+        record: Record, mapper: Type[BaseMapper[Record]], data: bytes
+    ) -> Record:
         """
         This method is the main way to interact with an instance of a class
         derived from this base.
@@ -27,8 +29,11 @@ class BaseDeserializer(metaclass=abc.ABCMeta):
 
     @classmethod
     def deserialize_from_file(
-        cls, record: R, mapper: Type[BaseMapper], file_object: IO[bytes]
-    ) -> R:
+        cls,
+        record: Record,
+        mapper: Type[BaseMapper[Record]],
+        file_object: IO[bytes],
+    ) -> Record:
         """
         A convenience method that reads data from a file object and maps it to
         the record with the passed in mapper.

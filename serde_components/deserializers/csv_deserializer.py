@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 import io
 import csv
-from typing import IO, Type
+from typing import Generic, IO, Type, TypeVar
 from typing import Iterable as Iter
 
 from .base import BaseDeserializer
 from ..mappers import BaseMapper
-from ..record import BaseRecord as R
+from ..record import Record
 
 
-class CsvDeserializer(BaseDeserializer):
+class CsvDeserializer(BaseDeserializer, Generic[Record]):
     @staticmethod
     def deserialize(  # type: ignore
-        records: Iter[R], mapper: Type[BaseMapper], data: bytes
-    ) -> Iter[R]:
+        records: Iter[Record], mapper: Type[BaseMapper[Record]], data: bytes
+    ) -> Iter[Record]:
         """
         This method takes in a iterable over the records and maps the data from
         a given csv. It takes an iterable since a csv will contain rows which
@@ -26,15 +26,18 @@ class CsvDeserializer(BaseDeserializer):
         file_object = io.StringIO(data.decode('utf-8'))
         dict_reader = csv.DictReader(file_object)
 
-        for record, row in zip(records, dict_reader):
-            mapper.map_deserialize(record, str(row).encode('utf-8'))
-
-        return records
+        return [
+            mapper.map_deserialize(record, str(row).encode('utf-8'))  # type: ignore
+            for record, row in zip(records, dict_reader)
+        ]
 
     @classmethod
     def deserialize_from_file(  # type: ignore
-        cls, record: Iter[R], mapper: Type[BaseMapper], file_object: IO[bytes]
-    ) -> Iter[R]:
+        cls,
+        record: Iter[Record],
+        mapper: Type[BaseMapper[Record]],
+        file_object: IO[bytes],
+    ) -> Iter[Record]:
         """
         This method only gets overwriten to change the accepted types.
         """

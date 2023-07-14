@@ -4,13 +4,15 @@ from typing import Type
 
 from .base import BaseDeserializer
 from ..mappers import BaseMapper
-from ..record import BaseRecord as R
+from ..record import Record
 
 
 class JsonDeserializer(BaseDeserializer):
     @staticmethod
-    def deserialize(record: R, mapper: Type[BaseMapper], data: bytes) -> R:
+    def deserialize(
+        record: Record, mapper: Type[BaseMapper[Record]], data: bytes
+    ) -> Record:
         json_data: bytes = str(json.loads(data)).encode('utf-8')
-        mapper.map_deserialize(record, json_data)
+        mapper.map_deserialize(record, json_data)  # type: ignore
 
         return record
