@@ -47,7 +47,7 @@ class Mapper(BaseMapper):
 
 class TsvSerializer(BaseSerializer):
     @staticmethod
-    def serialize(records: Iterable[Record], mapper: Type[BaseMapper]) -> bytes:
+    def serialize(records: Iterable[Record], mapper: Type[BaseMapper[Record]]) -> bytes:
         """
         This method takes in a iterable over the records and maps the data from
         a to a tsv format. It takes an iterable since a tsv will contain rows
@@ -60,7 +60,7 @@ class TsvSerializer(BaseSerializer):
 
         mapped_data = []
         for record in records:
-            b_data: bytes = mapper.map_serialize(record)
+            b_data: bytes = mapper.map_serialize(record)  # type: ignore
             data = b_data.decode('utf-8')
             mapped_data.append(ast.literal_eval(data))
 
