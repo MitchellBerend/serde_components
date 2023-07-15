@@ -66,7 +66,7 @@ are not supported out of the box.
 ```python
 import ast
 import io
-from typing import Any
+from typing import Iterable, Any
 
 from serde_components.mappers import BaseMapper
 from serde_components.record import BaseRecord
@@ -107,7 +107,7 @@ class Mapper(BaseMapper):
 # also includes a TsvSerializer.
 class TsvSerializer(BaseSerializer):
     @staticmethod
-    def serialize(records: Iter[R], mapper: Type[BaseMapper]) -> bytes:
+    def serialize(records: Iterable[R], mapper: Type[BaseMapper]) -> bytes:
         """
         This method takes in a iterable over the records and maps the data from
         a to a tsv format. It takes an iterable since a tsv will contain rows
