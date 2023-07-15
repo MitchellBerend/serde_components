@@ -4,7 +4,7 @@ import sys
 
 from .base import BaseDeserializer
 from ..mappers import BaseMapper
-from ..record import BaseRecord as R
+from ..record import Record
 
 PYTHON_VERSION_ERROR = 'Your python version does not support this component'
 
@@ -15,7 +15,9 @@ if sys.version_info.minor >= 11:
 
 class TomlDeserializer(BaseDeserializer):
     @staticmethod
-    def deserialize(record: R, mapper: Type[BaseMapper], data: bytes) -> R:
+    def deserialize(
+        record: Record, mapper: Type[BaseMapper[Record]], data: bytes
+    ) -> Record:
         """
         This method is only available in python versions 3.11 and later.
         """
@@ -28,6 +30,6 @@ class TomlDeserializer(BaseDeserializer):
             raise ImportError(PYTHON_VERSION_ERROR)
 
         toml_data: bytes = str(toml).encode('utf-8')
-        mapper.map_deserialize(record, toml_data)
+        mapper.map_deserialize(record, toml_data)  # type:ignore
 
         return record
