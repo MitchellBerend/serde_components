@@ -16,3 +16,6 @@ class JsonDeserializer(BaseDeserializer):
         mapper.map_deserialize(record, json_data)  # type: ignore
 
         return record
+
+
+JsonDeserializer.deserialize.__doc__ = BaseDeserializer.deserialize.__doc__

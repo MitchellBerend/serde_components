@@ -22,6 +22,14 @@ class BaseSerializer(abc.ABC, Generic[Record]):
         """
         This method is the main way to interact with an instance of a class
         derived from this base.
+
+        Args:
+            record: Some concrete record instance that inherits from BaseRecord.
+            mapper: Some concrete mapper class that inherits from BaseMapper,
+                this mapper should be specific for the type of record passed in.
+
+        Returns:
+            A bytestring of the data encoded by the specific Serializer.
         """
         raise NotImplementedError
 
@@ -32,6 +40,16 @@ class BaseSerializer(abc.ABC, Generic[Record]):
         """
         A convenience method that maps the record with the passed in mapper and
         writes it to a file object.
+
+        Args:
+            record: Some concrete record instance that inherits from BaseRecord.
+            mapper: Some concrete mapper class that inherits from BaseMapper,
+                this mapper should be specific for the type of record passed in.
+            file_object: Some file-like object that can be read from. This
+                includes io.BytesIO and file objects opened in byte mode.
+
+        Raises:
+            ValueError: An error has occured while doing I/O operations.
         """
         data = cls.serialize(record, mapper)
         file_object.write(data)

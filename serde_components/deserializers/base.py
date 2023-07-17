@@ -24,6 +24,16 @@ class BaseDeserializer(abc.ABC, Generic[Record]):
         """
         This method is the main way to interact with an instance of a class
         derived from this base.
+
+        Args:
+            record: Some concrete record instance that inherits from BaseRecord.
+            mapper: Some concrete mapper class that inherits from BaseMapper,
+                this mapper should be specific for the type of record passed in.
+            data: Some bytestring that represents the record in a format
+                specified by the concrete Deserializer.
+
+        Returns:
+            The passed record with data mapped from the data.
         """
         raise NotImplementedError
 
@@ -37,6 +47,21 @@ class BaseDeserializer(abc.ABC, Generic[Record]):
         """
         A convenience method that reads data from a file object and maps it to
         the record with the passed in mapper.
+
+        Args:
+            record: Some concrete record instance that inherits from BaseRecord.
+            mapper: Some concrete mapper class that inherits from BaseMapper,
+                this mapper should be specific for the type of record passed in.
+            data: Some bytestring that represents the record in a format
+                specified by the concrete Deserializer.
+            file_object: Some file-like object that can be read from. This
+                includes io.BytesIO and file objects opened in byte mode.
+
+        Returns:
+            The passed record with data mapped from the data.
+
+        Raises:
+            ValueError: An error has occured while doing I/O operations.
         """
         data = file_object.read()
         return cls.deserialize(record, mapper, data)

@@ -21,6 +21,17 @@ class CsvSerializer(BaseSerializer, Generic[Record]):
         This class takes a different type than the BaseSerializer, it does not
         make sense for a csv serializer to only map a single record. For this
         reason the type checking is ignored.
+
+        Args:
+            records: Some iterable of concrete record instances that inherits
+                from BaseRecord.
+            mapper: Some concrete mapper class that inherits from BaseMapper,
+                this mapper should be specific for the type of record passed in.
+            data: Some bytestring that represents the record in a format
+                specified by the concrete Deserializer.
+
+        Returns:
+            A bytestring of the data encoded by the specific Serializer.
         """
         mapped_data = []
         for record in records:
@@ -45,7 +56,19 @@ class CsvSerializer(BaseSerializer, Generic[Record]):
         cls, record: Iter[Record], mapper: Type[BaseMapper], file_object: IO[bytes]
     ) -> None:
         """
+        A convenience method that maps the record with the passed in mapper and
+        writes it to a file object.
         This method only gets overwriten to change the accepted types.
+
+        Args:
+            record: Some concrete record instance that inherits from BaseRecord.
+            mapper: Some concrete mapper class that inherits from BaseMapper,
+                this mapper should be specific for the type of record passed in.
+            file_object: Some file-like object that can be read from. This
+                includes io.BytesIO and file objects opened in byte mode.
+
+        Raises:
+            ValueError: An error has occured while doing I/O operations.
         """
         r = record
         m = mapper

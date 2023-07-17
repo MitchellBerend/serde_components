@@ -16,3 +16,6 @@ class JsonSerializer(BaseSerializer, Generic[Record]):
         json_data: bytes = json.dumps(data).encode('utf-8')
 
         return json_data
+
+
+JsonSerializer.serialize.__doc__ = BaseSerializer.serialize.__doc__
