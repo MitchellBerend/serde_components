@@ -19,7 +19,6 @@ pure-eval==0.2.2
 Pygments==2.16.1
 pytest==7.4.0
 pytest-cov==4.1.0
--e git+ssh://git@github.com/MitchellBerend/serde_components.git@de90a88f0c3bca844272217650185c896ec42726#egg=serde_components
 six==1.16.0
 stack-data==0.6.2
 tomli==2.0.1
