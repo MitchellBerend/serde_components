@@ -15,3 +15,7 @@ mypy:
 .PHONY:
 black:
 	@black -S serde_components/
+
+.PHONY:
+update-dependencies:
+	@poetry run pip freeze > dev-requirements.txt
