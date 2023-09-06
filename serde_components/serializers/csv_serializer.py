@@ -39,7 +39,7 @@ class CsvSerializer(BaseSerializer, Generic[Record]):
             data = b_data.decode('utf-8')
             mapped_data.append(ast.literal_eval(data))
 
-        assert len(mapped_data) > 1
+        assert len(mapped_data) >= 1
 
         keys = list(mapped_data[0].keys())
         file_object = io.StringIO('')
