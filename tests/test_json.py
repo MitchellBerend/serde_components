@@ -10,7 +10,7 @@ from serde_components.serializers import JsonSerializer
 
 
 class ConcreteRecord(BaseRecord):
-    def __init__(self, name, age):
+    def __init__(self, name=None, age=None):
         self.name = name
         self.age = age
 
@@ -97,6 +97,14 @@ def test_json_deserializer():
     t = ConcreteRecord(name='', age=0)
     json_data = b'"{\'age\': 10, \'name\': \'testName\'}"'
     JsonDeserializer.deserialize(t, Mapper, json_data)
+    golden_record = ConcreteRecord(name='testName', age=10)
+
+    assert t == golden_record
+
+
+def test_json_factory_deserializer():
+    json_data = b'"{\'age\': 10, \'name\': \'testName\'}"'
+    t = JsonDeserializer.deserialize(ConcreteRecord, Mapper, json_data)
     golden_record = ConcreteRecord(name='testName', age=10)
 
     assert t == golden_record

@@ -11,7 +11,7 @@ from serde_components.serializers import CsvSerializer, BaseSerializer
 
 
 class ConcreteRecord(BaseRecord):
-    def __init__(self, name, age):
+    def __init__(self, name=None, age=None):
         self.name = name
         self.age = age
 
@@ -117,6 +117,15 @@ def test_csv_deserializer():
         data = golden_file_object.read()[:-1]
     records = [ConcreteRecord(name='aaa', age=i + 100) for i in range(10)]
     records = CsvDeserializer.deserialize(records, Mapper, data)
+    golden_records = [ConcreteRecord(name='testName', age=i) for i in range(10)]
+
+    assert records == golden_records
+
+
+def test_factory_csv_deserializer():
+    with open('tests/data/csv/record2.csv', 'rb') as golden_file_object:
+        data = golden_file_object.read()[:-1]
+    records = CsvDeserializer.deserialize(ConcreteRecord, Mapper, data)
     golden_records = [ConcreteRecord(name='testName', age=i) for i in range(10)]
 
     assert records == golden_records
