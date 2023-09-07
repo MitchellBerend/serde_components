@@ -15,7 +15,7 @@ T = TypeVar('T')
 
 
 class ConcreteRecord(BaseRecord):
-    def __init__(self, name, age):
+    def __init__(self, name=None, age=None):
         self.name = name
         self.age = age
 
@@ -69,6 +69,18 @@ def test_toml_deserializer():
             TomlDeserializer.deserialize(t, Mapper, toml_data)
     else:
         TomlDeserializer.deserialize(t, Mapper, toml_data)
+        golden_record = ConcreteRecord(name='testName', age=10)
+
+        assert t == golden_record
+
+
+def test_toml_factory_deserializer():
+    toml_data = b'age = 10\nname = "testName"\n'
+    if sys.version_info.minor < 11:
+        with pytest.raises(ImportError):
+            t = TomlDeserializer.deserialize(ConcreteRecord, Mapper, toml_data)
+    else:
+        t = TomlDeserializer.deserialize(ConcreteRecord, Mapper, toml_data)
         golden_record = ConcreteRecord(name='testName', age=10)
 
         assert t == golden_record

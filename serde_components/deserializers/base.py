@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import abc
-from typing import Generic, IO, Iterable, Type
+from typing import Generic, IO, Iterable, Type, Union
 
 from ..mappers import BaseMapper
 from ..record import Record
+
+RKind = Union[Iterable[Record], Type[Record]]
 
 
 class BaseDeserializer(abc.ABC, Generic[Record]):
@@ -19,16 +21,18 @@ class BaseDeserializer(abc.ABC, Generic[Record]):
     @staticmethod
     @abc.abstractmethod
     def deserialize(
-        record: Record, mapper: Type[BaseMapper[Record]], data: bytes
+        record: RKind[Record], mapper: Type[BaseMapper[Record]], data: bytes
     ) -> Record:
         """
         This method is the main way to interact with an instance of a class
         derived from this base.
 
         Args:
-            record: Some concrete record instance that inherits from BaseRecord.
+            record: Some concrete record instance that inherits from
+                BaseRecord.
             mapper: Some concrete mapper class that inherits from BaseMapper,
-                this mapper should be specific for the type of record passed in.
+                this mapper should be specific for the type of record passed
+                in.
             data: Some bytestring that represents the record in a format
                 specified by the concrete Deserializer.
 
@@ -40,7 +44,7 @@ class BaseDeserializer(abc.ABC, Generic[Record]):
     @classmethod
     def deserialize_from_file(
         cls,
-        record: Record,
+        record: RKind[Record],
         mapper: Type[BaseMapper[Record]],
         file_object: IO[bytes],
     ) -> Record:
@@ -49,9 +53,11 @@ class BaseDeserializer(abc.ABC, Generic[Record]):
         the record with the passed in mapper.
 
         Args:
-            record: Some concrete record instance that inherits from BaseRecord.
+            record: Some concrete record instance that inherits from
+                BaseRecord.
             mapper: Some concrete mapper class that inherits from BaseMapper,
-                this mapper should be specific for the type of record passed in.
+                this mapper should be specific for the type of record passed
+                in.
             data: Some bytestring that represents the record in a format
                 specified by the concrete Deserializer.
             file_object: Some file-like object that can be read from. This
