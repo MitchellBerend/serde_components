@@ -59,7 +59,7 @@ def test_json_serializer():
     t = ConcreteRecord(name='testName', age=10)
     json_data = JsonSerializer.serialize(t, Mapper).decode()
 
-    assert json_data == "{\"age\": 10, \"name\": \"testName\"}"
+    assert json_data == '{"age": 10, "name": "testName"}'
 
 
 def test_json_serializer_to_file1():
