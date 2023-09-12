@@ -27,7 +27,8 @@ class TomlDeserializer(BaseDeserializer):
 
         Args:
             record: Some concrete record instance that inherits from
-                BaseRecord.
+                BaseRecord or a factory method that creates an instance of a
+                record when called.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.

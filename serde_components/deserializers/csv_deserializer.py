@@ -28,7 +28,8 @@ class CsvDeserializer(BaseDeserializer, Generic[Record]):
 
         Args:
             records: Some iterable of concrete record instances that inherits
-                from BaseRecord.
+                from BaseRecord or a factory method that creates an instance of
+                a record when called.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.
@@ -70,7 +71,9 @@ class CsvDeserializer(BaseDeserializer, Generic[Record]):
 
         Args:
             records: Some iterable of concrete record instances that inherits
-                from BaseRecord.
+                from BaseRecord or a factory method that creates an instance of
+                a record when called.
+
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.

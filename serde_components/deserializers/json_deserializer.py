@@ -11,11 +11,12 @@ T = TypeVar('T')
 RKind = Union[T, Type[T]]  # type:ignore
 
 
-class JsonDeserializer(BaseDeserializer):
+class JsonDeserializer(BaseDeserializer[Record]):
     @staticmethod
-    def deserialize(
+    def deserialize(  # type:ignore
         record: RKind[Record], mapper: Type[BaseMapper[Record]], data: bytes
     ) -> Record:  # type:ignore
+        """This docstring gets overwritten with the original one."""
         json_data: bytes = str(json.loads(data)).encode('utf-8')
         _rv = None
 
