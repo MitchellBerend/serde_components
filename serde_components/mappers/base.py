@@ -15,10 +15,10 @@ class BaseMapper(abc.ABC, Generic[Record]):
 
     @staticmethod
     @abc.abstractmethod
-    def map_serialize(record: Record) -> bytes:
+    def map_deserialize(record: Record) -> bytes:
         raise NotImplementedError
 
     @staticmethod
     @abc.abstractmethod
-    def map_deserialize(record: Record, data: bytes) -> Record:
+    def map_serialize(record: Record, data: bytes) -> Record:
         raise NotImplementedError
