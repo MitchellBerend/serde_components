@@ -25,7 +25,7 @@ class ConcreteRecord(BaseRecord):
 
 class Mapper(BaseMapper):
     @staticmethod
-    def map_serialize(record: ConcreteRecord) -> bytes:
+    def map_deserialize(record: ConcreteRecord) -> bytes:
         rv = {}
         if record.name:
             rv['name'] = record.name
@@ -35,7 +35,7 @@ class Mapper(BaseMapper):
         return str(rv).encode('utf-8')
 
     @staticmethod
-    def map_deserialize(record: ConcreteRecord, data: bytes) -> ConcreteRecord:
+    def map_serialize(record: ConcreteRecord, data: bytes) -> ConcreteRecord:
         _data = ast.literal_eval(data.decode('utf-8'))
         age = _data.get('age')
         if isinstance(age, str):
@@ -52,7 +52,7 @@ class Mapper(BaseMapper):
 
 def test_general_mapper():
     t = ConcreteRecord(name='testName', age=10)
-    data = ast.literal_eval(Mapper.map_serialize(t).decode('utf-8'))
+    data = ast.literal_eval(Mapper.map_deserialize(t).decode('utf-8'))
     golden_data = {
         'age': 10,
         'name': 'testName',
