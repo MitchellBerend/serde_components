@@ -1,32 +1,21 @@
 # -*- coding: utf-8 -*-
-import inspect
+import ast
 import json
-from typing import Type, TypeVar, Union
+from typing import Generic, Type
 
 from .base import BaseDeserializer
 from ..mappers import BaseMapper
 from ..record import Record
 
-T = TypeVar('T')
-RKind = Union[T, Type[T]]  # type:ignore
 
-
-class JsonDeserializer(BaseDeserializer[Record]):
+class JsonDeserializer(BaseDeserializer, Generic[Record]):
     @staticmethod
-    def deserialize(  # type:ignore
-        record: RKind[Record], mapper: Type[BaseMapper[Record]], data: bytes
-    ) -> Record:  # type:ignore
-        """This docstring gets overwritten with the original one."""
-        json_data: bytes = str(json.loads(data)).encode('utf-8')
-        _rv = None
+    def deserialize(record: Record, mapper: Type[BaseMapper[Record]]) -> bytes:
+        _data: bytes = mapper.map_deserialize(record)  # type: ignore
+        data = ast.literal_eval(_data.decode('utf-8'))
+        json_data: bytes = json.dumps(data).encode('utf-8')
 
-        if inspect.isclass(record):
-            _record = record()
-            _rv = mapper.map_deserialize(_record, json_data)  # type: ignore
-        else:
-            _rv = mapper.map_deserialize(record, json_data)  # type: ignore
-
-        return _rv  # type:ignore
+        return json_data
 
 
 JsonDeserializer.deserialize.__doc__ = BaseDeserializer.deserialize.__doc__

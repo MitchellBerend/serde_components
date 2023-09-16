@@ -3,7 +3,7 @@ import inspect
 from typing import IO, Type, Union
 import sys
 
-from .base import BaseDeserializer
+from .base import BaseSerializer
 from ..mappers import BaseMapper
 from ..record import Record
 
@@ -15,9 +15,9 @@ if sys.version_info.minor >= 11:
     import tomllib  # type:ignore
 
 
-class TomlDeserializer(BaseDeserializer):
+class TomlSerializer(BaseSerializer):
     @staticmethod
-    def deserialize(
+    def serialize(
         record: RKind[Record],
         mapper: Type[BaseMapper[Record]],  # type:ignore
         data: bytes,
@@ -33,7 +33,7 @@ class TomlDeserializer(BaseDeserializer):
                 this mapper should be specific for the type of record passed
                 in.
             data: Some bytestring that represents the record in a format
-                specified by the concrete Deserializer.
+                specified by the concrete Serializer.
 
         Returns:
             The passed record with data mapped from the data.
@@ -55,14 +55,14 @@ class TomlDeserializer(BaseDeserializer):
 
         if inspect.isclass(record):
             _record = record()
-            _rv = mapper.map_deserialize(_record, toml_data)  # type:ignore
+            _rv = mapper.map_serialize(_record, toml_data)  # type:ignore
         else:
-            _rv = mapper.map_deserialize(record, toml_data)  # type:ignore
+            _rv = mapper.map_serialize(record, toml_data)  # type:ignore
 
         return _rv  # type:ignore
 
     @classmethod
-    def deserialize_from_file(
+    def serialize_from_file(
         cls,
         record: RKind[Record],
         mapper: Type[BaseMapper[Record]],
@@ -78,7 +78,7 @@ class TomlDeserializer(BaseDeserializer):
                 this mapper should be specific for the type of record passed
                 in.
             data: Some bytestring that represents the record in a format
-                specified by the concrete Deserializer.
+                specified by the concrete Serializer.
 
         Returns:
             The passed record with data mapped from the data.
@@ -91,4 +91,4 @@ class TomlDeserializer(BaseDeserializer):
         r = record
         m = mapper
         fo = file_object
-        return super().deserialize_from_file(r, m, fo)  # type:ignore
+        return super().serialize_from_file(r, m, fo)  # type:ignore

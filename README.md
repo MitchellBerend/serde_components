@@ -15,25 +15,25 @@ transformation and output of custom classes or objects. It implements some
 components and defines an interface to let custom ones interact with them. There
 are 3 types of components that are currently defined.
 
+ - DeSerializers
  - Serializers
- - Deserializers
  - Mappers
-
-## Serializers
-
-Serializers handle the input of a file format to a unspecified data structure.
-Some file formats like json will map directly to a file format in python, but
-this might not be the case for all file formats. Make sure to read the
-documentation of the specific serializer to find what data structure it
-produces.
 
 ## Deserializers
 
-Deserializers handle the output of a file format from a unspecified data
+Deserializers handle the input of a file format to a unspecified data structure.
+Some file formats like json will map directly to a file format in python, but
+this might not be the case for all file formats. Make sure to read the
+documentation of the specific deserializer to find what data structure it
+produces.
+
+## Serializers
+
+Serializers handle the output of a file format from a unspecified data
 structure. Some data structures map to a file format nicely, for example a dict
 to a json object. Some file formats might expect a very specific structure like
 a csv that expects a list of dicts that all have the same keys. Make sure to
-read the documentation of the specific deserializer to find what limits there
+read the documentation of the specific serializer to find what limits there
 are in terms of data structures.
 
 ## Mappers
@@ -51,9 +51,9 @@ will produce the desired outcome.
 This way changing from json to toml will be a simple serializer swap without
 touching the rest of the code.
 
-Caution should be taken when the data structure that the serializer or
-deserializer produes is not the same. A json serializer will not produce the
-same data structure as the csv serializer.
+Caution should be taken when the data structure that the deserializer or
+serializer produes is not the same. A json serializer will not produce the same
+data structure as the csv deserializer.
 
 This library does not contain (de)serializers that depend on non standard
 library provided modules and that is a conscious choice. It should be up to the
@@ -83,7 +83,7 @@ class Record(BaseRecord):
 
 
 # This mapper does not take BaseRecord, since this mapper is specific to the
-# concrete Record defined above. It's probably a good idea to give your own 
+# concrete Record defined above. It's probably a good idea to give your own
 # implementations a proper name.
 class Mapper(BaseMapper):
     @staticmethod
@@ -131,7 +131,7 @@ class TsvSerializer(BaseSerializer):
 
         writer = csv.DictWriter(
             file_object,
-            fieldnames=keys, 
+            fieldnames=keys,
             delimiter='t',
             dialect='unix',
         )
