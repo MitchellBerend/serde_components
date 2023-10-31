@@ -2,7 +2,6 @@
 import inspect
 from typing import IO, Type, TypeVar, Union
 import sys
-
 from .base import BaseSerializer
 from ..mappers import BaseMapper
 
@@ -56,9 +55,9 @@ class TomlSerializer(BaseSerializer[T]):
             _record = record()
             _rv = mapper.map_serialize(_record, toml_data)
         else:
-            _rv = mapper.map_serialize(record, toml_data)
+            _rv = mapper.map_serialize(record, toml_data)  # type: ignore
 
-        return _rv
+        return _rv  # type: ignore
 
     @classmethod
     def serialize_from_file(

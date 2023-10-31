@@ -12,7 +12,11 @@ RKind = Union[T, Type[T]]
 
 class JsonSerializer(BaseSerializer[T]):
     @staticmethod
-    def serialize(record: RKind[T], mapper: Type[BaseMapper[T]], data: bytes) -> T:
+    def serialize(
+        record: RKind[T],
+        mapper: Type[BaseMapper[T]],
+        data: bytes,
+    ) -> T:
         """This docstring gets overwritten with the original one."""
         json_data: bytes = str(json.loads(data)).encode('utf-8')
         _rv = None
@@ -21,9 +25,9 @@ class JsonSerializer(BaseSerializer[T]):
             _record = record()
             _rv = mapper.map_serialize(_record, json_data)
         else:
-            _rv = mapper.map_serialize(record, json_data)
+            _rv = mapper.map_serialize(record, json_data)  # type:ignore
 
-        return _rv
+        return _rv  # type:ignore
 
 
 JsonSerializer.serialize.__doc__ = BaseSerializer.serialize.__doc__

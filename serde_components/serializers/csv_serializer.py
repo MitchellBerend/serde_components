@@ -42,12 +42,18 @@ class CsvSerializer(BaseSerializer, Generic[T]):
 
         if isinstance(records, Iter):
             return [
-                mapper.map_serialize(record, str(row).encode('utf-8'))
+                mapper.map_serialize(
+                    record,  # type:ignore
+                    str(row).encode('utf-8'),
+                )  # type:ignore
                 for record, row in zip(records, dict_reader)
             ]
         else:
             return [
-                mapper.map_serialize(records(), str(row).encode('utf-8'))
+                mapper.map_serialize(
+                    records(),  # type:ignore
+                    str(row).encode('utf-8'),
+                )  # type:ignore
                 for row in dict_reader
             ]
 

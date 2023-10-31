@@ -37,7 +37,7 @@ class CsvDeserializer(BaseDeserializer, Generic[T]):
         """
         mapped_data = []
         for record in records:
-            b_data: bytes = mapper.map_deserialize(record)
+            b_data: bytes = mapper.map_deserialize(record)  # type:ignore
             data = b_data.decode('utf-8')
             mapped_data.append(ast.literal_eval(data))
 
