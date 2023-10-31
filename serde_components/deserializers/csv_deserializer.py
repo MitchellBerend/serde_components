@@ -2,31 +2,33 @@
 import ast
 import io
 import csv
-from typing import Generic, IO, Type
+from typing import Generic, IO, Type, TypeVar
 from typing import Iterable as Iter
 
 from .base import BaseDeserializer
 from ..mappers import BaseMapper
-from ..record import Record
 
 
-class CsvDeserializer(BaseDeserializer, Generic[Record]):
+T = TypeVar('T')
+
+
+class CsvDeserializer(BaseDeserializer, Generic[T]):
     @staticmethod
-    def deserialize(records: Iter[Record], mapper: Type[BaseMapper[Record]]) -> bytes:  # type: ignore
+    def deserialize(records: Iter[T], mapper: Type[BaseMapper[T]]) -> bytes:
         """
         This method takes in a iterable over the records and maps the data from
         a to a csv format. It takes an iterable since a csv will contain rows
         which should correspond with a single record.
 
-        This class takes a different type than the BaseDeserializer, it does not
-        make sense for a csv deserializer to only map a single record. For this
-        reason the type checking is ignored.
+        This class takes a different type than the BaseDeserializer, it does
+        not make sense for a csv deserializer to only map a single record. For
+        this reason the type checking is ignored.
 
         Args:
-            records: Some iterable of concrete record instances that inherits
-                from BaseRecord.
+            records: Some iterable of concrete record instances.
             mapper: Some concrete mapper class that inherits from BaseMapper,
-                this mapper should be specific for the type of record passed in.
+                this mapper should be specific for the type of record passed
+                in.
             data: Some bytestring that represents the record in a format
                 specified by the concrete Deserializer.
 
@@ -35,7 +37,7 @@ class CsvDeserializer(BaseDeserializer, Generic[Record]):
         """
         mapped_data = []
         for record in records:
-            b_data: bytes = mapper.map_deserialize(record)  # type: ignore
+            b_data: bytes = mapper.map_deserialize(record)
             data = b_data.decode('utf-8')
             mapped_data.append(ast.literal_eval(data))
 
@@ -52,8 +54,8 @@ class CsvDeserializer(BaseDeserializer, Generic[Record]):
         return file_object.getvalue().encode('utf-8')
 
     @classmethod
-    def deserialize_to_file(  # type: ignore
-        cls, record: Iter[Record], mapper: Type[BaseMapper], file_object: IO[bytes]
+    def deserialize_to_file(
+        cls, record: Iter[T], mapper: Type[BaseMapper], file_object: IO[bytes]
     ) -> None:
         """
         A convenience method that maps the record with the passed in mapper and
@@ -61,9 +63,10 @@ class CsvDeserializer(BaseDeserializer, Generic[Record]):
         This method only gets overwriten to change the accepted types.
 
         Args:
-            record: Some concrete record instance that inherits from BaseRecord.
+            record: Some concrete record instance.
             mapper: Some concrete mapper class that inherits from BaseMapper,
-                this mapper should be specific for the type of record passed in.
+                this mapper should be specific for the type of record passed
+                in.
             file_object: Some file-like object that can be read from. This
                 includes io.BytesIO and file objects opened in byte mode.
 
@@ -73,4 +76,4 @@ class CsvDeserializer(BaseDeserializer, Generic[Record]):
         r = record
         m = mapper
         f = file_object
-        return super().deserialize_to_file(r, m, f)  # type: ignore
+        return super().deserialize_to_file(r, m, f)

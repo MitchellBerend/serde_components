@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 import ast
 import json
-from typing import Generic, Type
+from typing import Generic, Type, TypeVar
 
 from .base import BaseDeserializer
 from ..mappers import BaseMapper
-from ..record import Record
+
+T = TypeVar('T')
 
 
-class JsonDeserializer(BaseDeserializer, Generic[Record]):
+class JsonDeserializer(BaseDeserializer, Generic[T]):
     @staticmethod
-    def deserialize(record: Record, mapper: Type[BaseMapper[Record]]) -> bytes:
-        _data: bytes = mapper.map_deserialize(record)  # type: ignore
+    def deserialize(record: T, mapper: Type[BaseMapper[T]]) -> bytes:
+        _data: bytes = mapper.map_deserialize(record)
         data = ast.literal_eval(_data.decode('utf-8'))
         json_data: bytes = json.dumps(data).encode('utf-8')
 

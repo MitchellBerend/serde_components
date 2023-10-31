@@ -4,11 +4,10 @@ import io
 
 from serde_components.serializers import JsonSerializer
 from serde_components.mappers import BaseMapper
-from serde_components.record.base import BaseRecord
 from serde_components.deserializers import JsonDeserializer
 
 
-class ConcreteRecord(BaseRecord):
+class ConcreteRecord:
     def __init__(self, name=None, age=None):
         self.name = name
         self.age = age
@@ -17,7 +16,7 @@ class ConcreteRecord(BaseRecord):
         return self.age == other.age and self.name == other.name
 
 
-class Mapper(BaseMapper):
+class Mapper(BaseMapper[ConcreteRecord]):
     @staticmethod
     def map_deserialize(record: ConcreteRecord) -> bytes:
         return str(
