@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import abc
-from typing import Generic, IO, Type, Union
+from typing import Generic, IO, Type, TypeVar, Union
 
 from ..mappers import BaseMapper
-from ..record import Record
 
-RKind = Union[Record, Type[Record]]
+T = TypeVar('T')
+RKind = Union[T, Type[T]]
 
 
-class BaseSerializer(abc.ABC, Generic[Record]):
+class BaseSerializer(abc.ABC, Generic[T]):
     """
     This base class defines the interface that all serializers must
     implement. All methods that require implementation are marked with the
@@ -20,17 +20,14 @@ class BaseSerializer(abc.ABC, Generic[Record]):
 
     @staticmethod
     @abc.abstractmethod
-    def serialize(
-        record: RKind[Record], mapper: Type[BaseMapper[Record]], data: bytes
-    ) -> Record:
+    def serialize(record: RKind[T], mapper: Type[BaseMapper[T]], data: bytes) -> T:
         """
         This method is the main way to interact with an instance of a class
         derived from this base.
 
         Args:
-            record: Some concrete record instance that inherits from
-                BaseRecord or a factory method that creates an instance of a
-                record when called.
+            record: Some concrete record instance or a factory method that
+                creates an instance of a record when called.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.
@@ -45,17 +42,17 @@ class BaseSerializer(abc.ABC, Generic[Record]):
     @classmethod
     def serialize_from_file(
         cls,
-        record: RKind[Record],
-        mapper: Type[BaseMapper[Record]],
+        record: RKind[T],
+        mapper: Type[BaseMapper[T]],
         file_object: IO[bytes],
-    ) -> Record:
+    ) -> T:
         """
         A convenience method that reads data from a file object and maps it to
         the record with the passed in mapper.
 
         Args:
-            record: Some concrete record instance that inherits from
-                BaseRecord  or a factory method that creates an instance of a
+            record: Some concrete record instance or a factory method that
+                creates an instance of a
                 record when called.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed

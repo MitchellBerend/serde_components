@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import abc
-from typing import Generic
-
-from ..record import Record
+from typing import Generic, Type, TypeVar, Union
 
 
-class BaseMapper(abc.ABC, Generic[Record]):
+T = TypeVar('T')
+RKind = Union[T, Type[T]]
+
+
+class BaseMapper(abc.ABC, Generic[T]):
     """
     This class defines the interface that is required in order to use a derived
     class as a mapper object. It is technically possible to implement a class
@@ -15,10 +17,10 @@ class BaseMapper(abc.ABC, Generic[Record]):
 
     @staticmethod
     @abc.abstractmethod
-    def map_deserialize(record: Record) -> bytes:
+    def map_deserialize(record: RKind[T]) -> bytes:
         raise NotImplementedError
 
     @staticmethod
     @abc.abstractmethod
-    def map_serialize(record: Record, data: bytes) -> Record:
+    def map_serialize(record: RKind[T], data: bytes) -> T:
         raise NotImplementedError

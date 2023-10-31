@@ -6,17 +6,16 @@ from typing import Iterable as Iter
 
 from .base import BaseSerializer
 from ..mappers import BaseMapper
-from ..record import Record
 
 T = TypeVar('T')
 RKind = Union[Iter[T], Type[T]]
 
 
-class CsvSerializer(BaseSerializer, Generic[Record]):
+class CsvSerializer(BaseSerializer, Generic[T]):
     @staticmethod
-    def serialize(  # type: ignore
-        records: RKind[Record], mapper: Type[BaseMapper[Record]], data: bytes
-    ) -> Iter[Record]:
+    def serialize(
+        records: RKind[T], mapper: Type[BaseMapper[T]], data: bytes
+    ) -> Iter[T]:
         """
         This method takes in a iterable over the records and maps the data from
         a given csv. It takes an iterable since a csv will contain rows which
@@ -27,9 +26,8 @@ class CsvSerializer(BaseSerializer, Generic[Record]):
         reason the type checking is ignored.
 
         Args:
-            records: Some iterable of concrete record instances that inherits
-                from BaseRecord or a factory method that creates an instance of
-                a record when called.
+            records: Some iterable of concrete record instances or a factory
+                method that creates an instance of a record when called.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.
@@ -44,24 +42,28 @@ class CsvSerializer(BaseSerializer, Generic[Record]):
 
         if isinstance(records, Iter):
             return [
-                mapper.map_serialize(record, str(row).encode('utf-8'))  # type: ignore
+                mapper.map_serialize(
+                    record,  # type:ignore
+                    str(row).encode('utf-8'),
+                )  # type:ignore
                 for record, row in zip(records, dict_reader)
             ]
         else:
             return [
                 mapper.map_serialize(
-                    records(), str(row).encode('utf-8')  # type: ignore
-                )
+                    records(),  # type:ignore
+                    str(row).encode('utf-8'),
+                )  # type:ignore
                 for row in dict_reader
             ]
 
     @classmethod
-    def serialize_from_file(  # type: ignore
+    def serialize_from_file(
         cls,
-        record: RKind[Record],
-        mapper: Type[BaseMapper[Record]],
+        record: RKind[T],
+        mapper: Type[BaseMapper[T]],
         file_object: IO[bytes],
-    ) -> Iter[Record]:
+    ) -> Iter[T]:
         """
         A convenience method that reads data from a file object and maps it to
         the record with the passed in mapper.
@@ -70,10 +72,8 @@ class CsvSerializer(BaseSerializer, Generic[Record]):
         BaseSerializer for more details.
 
         Args:
-            records: Some iterable of concrete record instances that inherits
-                from BaseRecord or a factory method that creates an instance of
-                a record when called.
-
+            records: Some iterable of concrete record instances or a factory
+                method that creates an instance of a record when called.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.
@@ -91,4 +91,4 @@ class CsvSerializer(BaseSerializer, Generic[Record]):
         r = record
         m = mapper
         f = file_object
-        return super().serialize_from_file(r, m, f)  # type: ignore
+        return super().serialize_from_file(r, m, f)

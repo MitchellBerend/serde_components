@@ -6,11 +6,10 @@ from typing import Iterable, Type
 
 from serde_components.serializers import CsvSerializer
 from serde_components.mappers import BaseMapper
-from serde_components.record import BaseRecord, Record
 from serde_components.deserializers import CsvDeserializer, BaseDeserializer
 
 
-class ConcreteRecord(BaseRecord):
+class ConcreteRecord:
     def __init__(self, name=None, age=None):
         self.name = name
         self.age = age
@@ -19,9 +18,9 @@ class ConcreteRecord(BaseRecord):
         return self.age == other.age and self.name == other.name
 
 
-class Mapper(BaseMapper):
+class Mapper(BaseMapper[ConcreteRecord]):
     @staticmethod
-    def map_deserialize(record: ConcreteRecord) -> bytes:  # type: ignore
+    def map_deserialize(record: ConcreteRecord) -> bytes:
         return str(
             {
                 'age': record.age,
@@ -30,7 +29,7 @@ class Mapper(BaseMapper):
         ).encode('utf-8')
 
     @staticmethod
-    def map_serialize(record: ConcreteRecord, data: bytes) -> ConcreteRecord:  # type: ignore
+    def map_serialize(record: ConcreteRecord, data: bytes) -> ConcreteRecord:
         _data = ast.literal_eval(data.decode('utf-8'))
         age = _data.get('age')
         if isinstance(age, str):
@@ -48,7 +47,8 @@ class Mapper(BaseMapper):
 class TsvDeserializer(BaseDeserializer):
     @staticmethod
     def deserialize(
-        records: Iterable[Record], mapper: Type[BaseMapper[Record]]
+        records: Iterable[ConcreteRecord],
+        mapper: Type[BaseMapper[ConcreteRecord]],
     ) -> bytes:
         """
         This method takes in a iterable over the records and maps the data from
@@ -62,10 +62,9 @@ class TsvDeserializer(BaseDeserializer):
 
         mapped_data = []
         for record in records:
-            b_data: bytes = mapper.map_serialize(record)  # type: ignore
+            b_data: bytes = mapper.map_deserialize(record)
             data = b_data.decode('utf-8')
             mapped_data.append(ast.literal_eval(data))
-
         assert len(mapped_data) > 1
 
         keys = list(mapped_data[0].keys())

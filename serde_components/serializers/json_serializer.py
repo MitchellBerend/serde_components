@@ -5,26 +5,27 @@ from typing import Type, TypeVar, Union
 
 from .base import BaseSerializer
 from ..mappers import BaseMapper
-from ..record import Record
 
 T = TypeVar('T')
-RKind = Union[T, Type[T]]  # type:ignore
+RKind = Union[T, Type[T]]
 
 
-class JsonSerializer(BaseSerializer[Record]):
+class JsonSerializer(BaseSerializer[T]):
     @staticmethod
-    def serialize(  # type:ignore
-        record: RKind[Record], mapper: Type[BaseMapper[Record]], data: bytes
-    ) -> Record:  # type:ignore
+    def serialize(
+        record: RKind[T],
+        mapper: Type[BaseMapper[T]],
+        data: bytes,
+    ) -> T:
         """This docstring gets overwritten with the original one."""
         json_data: bytes = str(json.loads(data)).encode('utf-8')
         _rv = None
 
         if inspect.isclass(record):
             _record = record()
-            _rv = mapper.map_serialize(_record, json_data)  # type: ignore
+            _rv = mapper.map_serialize(_record, json_data)
         else:
-            _rv = mapper.map_serialize(record, json_data)  # type: ignore
+            _rv = mapper.map_serialize(record, json_data)  # type:ignore
 
         return _rv  # type:ignore
 

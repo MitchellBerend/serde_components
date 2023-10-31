@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import inspect
-from typing import IO, Type, Union
+from typing import IO, Type, TypeVar, Union
 import sys
-
 from .base import BaseSerializer
 from ..mappers import BaseMapper
-from ..record import Record
 
-RKind = Union[Record, Type[Record]]  # type:ignore
+T = TypeVar('T')
+RKind = Union[T, Type[T]]
 PYTHON_VERSION_ERROR = 'Your python version does not support this component'
 
 
@@ -15,20 +14,19 @@ if sys.version_info.minor >= 11:
     import tomllib  # type:ignore
 
 
-class TomlSerializer(BaseSerializer):
+class TomlSerializer(BaseSerializer[T]):
     @staticmethod
     def serialize(
-        record: RKind[Record],
-        mapper: Type[BaseMapper[Record]],  # type:ignore
+        record: RKind[T],
+        mapper: Type[BaseMapper[T]],
         data: bytes,
-    ) -> Record:  # type:ignore
+    ) -> T:
         """
         This method is only available in python versions 3.11 and later.
 
         Args:
-            record: Some concrete record instance that inherits from
-                BaseRecord or a factory method that creates an instance of a
-                record when called.
+            record: Some concrete record instance or a factory method that
+                creates an instance of a record when called.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.
@@ -55,25 +53,24 @@ class TomlSerializer(BaseSerializer):
 
         if inspect.isclass(record):
             _record = record()
-            _rv = mapper.map_serialize(_record, toml_data)  # type:ignore
+            _rv = mapper.map_serialize(_record, toml_data)
         else:
-            _rv = mapper.map_serialize(record, toml_data)  # type:ignore
+            _rv = mapper.map_serialize(record, toml_data)  # type: ignore
 
-        return _rv  # type:ignore
+        return _rv  # type: ignore
 
     @classmethod
     def serialize_from_file(
         cls,
-        record: RKind[Record],
-        mapper: Type[BaseMapper[Record]],
+        record: RKind[T],
+        mapper: Type[BaseMapper[T]],
         file_object: IO[bytes],
-    ) -> Record:  # type:ignore
+    ) -> T:
         """
         This method is only available in python versions 3.11 and later.
 
         Args:
-            record: Some concrete record instance that inherits from
-                BaseRecord.
+            record: Some concrete record instance.
             mapper: Some concrete mapper class that inherits from BaseMapper,
                 this mapper should be specific for the type of record passed
                 in.
@@ -91,4 +88,4 @@ class TomlSerializer(BaseSerializer):
         r = record
         m = mapper
         fo = file_object
-        return super().serialize_from_file(r, m, fo)  # type:ignore
+        return super().serialize_from_file(r, m, fo)

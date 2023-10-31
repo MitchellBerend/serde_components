@@ -66,14 +66,15 @@ are not supported out of the box.
 ```python
 import ast
 import io
-from typing import Iterable, Any
+from typing import Any, Iterable, TypeVar
 
 from serde_components.mappers import BaseMapper
-from serde_components.record import BaseRecord
 from serde_components.serializers import JsonSerializer, BaseSerializer
 
+T = TypeVar('T')
 
-class Record(BaseRecord):
+
+class Record:
     def __init__(self, name: str, age: int):
         self.name = name
         self.age = age
@@ -82,10 +83,9 @@ class Record(BaseRecord):
         return self.age == other.age and self.name == other.name
 
 
-# This mapper does not take BaseRecord, since this mapper is specific to the
-# concrete Record defined above. It's probably a good idea to give your own
-# implementations a proper name.
-class Mapper(BaseMapper):
+# This mapper takes a concrete Record defined above. It's probably a good idea
+# to give your own implementations a proper name.
+class Mapper(BaseMapper[Record]):
     @staticmethod
     def map_serialize(record: Record) -> bytes:
         return str(
@@ -105,9 +105,9 @@ class Mapper(BaseMapper):
 
 # Since the CsvSerializer only produces comma separated data, this exmaple
 # also includes a TsvSerializer.
-class TsvSerializer(BaseSerializer):
+class TsvSerializer(BaseSerializer[T]):
     @staticmethod
-    def serialize(records: Iterable[R], mapper: Type[BaseMapper]) -> bytes:
+    def serialize(records: Iterable[R], mapper: Type[BaseMapper[T]]) -> bytes:
         """
         This method takes in a iterable over the records and maps the data from
         a to a tsv format. It takes an iterable since a tsv will contain rows
