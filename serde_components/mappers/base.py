@@ -17,7 +17,7 @@ class BaseMapper(abc.ABC, Generic[T]):
 
     @staticmethod
     @abc.abstractmethod
-    def map_deserialize(record: T) -> bytes:
+    def map_deserialize(record: RKind[T]) -> bytes:
         raise NotImplementedError
 
     @staticmethod
