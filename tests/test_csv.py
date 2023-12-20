@@ -2,25 +2,21 @@
 import ast
 import csv
 import io
-from typing import Iterable, Type
+from typing import Iterable, Type, Union
 
 from serde_components.serializers import CsvSerializer
 from serde_components.mappers import BaseMapper
 from serde_components.deserializers import CsvDeserializer, BaseDeserializer
 
+from .conftest import ConcreteRecord
 
-class ConcreteRecord:
-    def __init__(self, name=None, age=None):
-        self.name = name
-        self.age = age
-
-    def __eq__(self, other) -> bool:
-        return self.age == other.age and self.name == other.name
+Alias = Union[ConcreteRecord, Type[ConcreteRecord]]
 
 
 class Mapper(BaseMapper[ConcreteRecord]):
     @staticmethod
-    def map_deserialize(record: ConcreteRecord) -> bytes:
+    def map_deserialize(record: Alias) -> bytes:
+        assert isinstance(record, ConcreteRecord)
         return str(
             {
                 'age': record.age,
@@ -29,7 +25,8 @@ class Mapper(BaseMapper[ConcreteRecord]):
         ).encode('utf-8')
 
     @staticmethod
-    def map_serialize(record: ConcreteRecord, data: bytes) -> ConcreteRecord:
+    def map_serialize(record: Alias, data: bytes) -> ConcreteRecord:
+        assert isinstance(record, ConcreteRecord)
         _data = ast.literal_eval(data.decode('utf-8'))
         age = _data.get('age')
         if isinstance(age, str):
@@ -45,8 +42,10 @@ class Mapper(BaseMapper[ConcreteRecord]):
 
 
 class TsvDeserializer(BaseDeserializer):
+    # The type ignore is here to remove a warning. This warning is valid, but
+    # this class changes the shape of the required inputs.
     @staticmethod
-    def deserialize(
+    def deserialize(  # type:ignore
         records: Iterable[ConcreteRecord],
         mapper: Type[BaseMapper[ConcreteRecord]],
     ) -> bytes:
@@ -83,9 +82,8 @@ class TsvDeserializer(BaseDeserializer):
         return file_object.getvalue().encode('utf-8')
 
 
-def test_general_mapper():
-    t = ConcreteRecord(name='testName', age=10)
-    data = ast.literal_eval(Mapper.map_deserialize(t).decode('utf-8'))
+def test_general_mapper(record):
+    data = ast.literal_eval(Mapper.map_deserialize(record).decode('utf-8'))
     golden_data = {
         'age': 10,
         'name': 'testName',
@@ -94,33 +92,32 @@ def test_general_mapper():
     assert data == golden_data
 
 
-def test_csv_deserializer():
-    data = [ConcreteRecord(name='testName', age=i) for i in range(10)]
-    csv_data = CsvDeserializer.deserialize(data, Mapper).decode()
+def test_csv_deserializer(multiple_records):
+    csv_data = CsvDeserializer.deserialize(multiple_records, Mapper).decode()
     with open('tests/data/csv/record1.csv', 'r') as golden_file_object:
         golden_bytes = golden_file_object.read()[:-1]
 
     assert csv_data == golden_bytes
 
 
-def test_csv_deserializer_to_file():
-    data = [ConcreteRecord(name='testName', age=i) for i in range(10)]
+def test_csv_deserializer_to_file(multiple_records):
     file_object = io.BytesIO(b'')
-    CsvDeserializer.deserialize_to_file(data, Mapper, file_object)
+    CsvDeserializer.deserialize_to_file(multiple_records, Mapper, file_object)
     with open('tests/data/csv/record1.csv', 'rb') as golden_file_object:
         golden_bytes = golden_file_object.read()[:-1]
 
     assert file_object.getvalue() == golden_bytes
 
 
-def test_csv_serializer():
+def test_overwrite_csv_serializer(multiple_records):
     with open('tests/data/csv/record2.csv', 'rb') as golden_file_object:
         data = golden_file_object.read()[:-1]
-    records = [ConcreteRecord(name='aaa', age=i + 100) for i in range(10)]
-    records = CsvSerializer.serialize(records, Mapper, data)
+
+    # This is making sure the records are overwritten
+    multiple_records = CsvSerializer.serialize(multiple_records, Mapper, data)
     golden_records = [ConcreteRecord(name='testName', age=i) for i in range(10)]
 
-    assert records == golden_records
+    assert multiple_records == golden_records
 
 
 def test_factory_csv_serializer():
@@ -132,10 +129,12 @@ def test_factory_csv_serializer():
     assert records == golden_records
 
 
-def test_csv_serializer_from_filebuffer():
+def test_overwrite_csv_serializer_from_filebuffer():
     with open('tests/data/csv/record2.csv', 'rb') as golden_file_object:
         data = golden_file_object.read()[:-1]
     file_object = io.BytesIO(data)
+
+    # This is making sure the records are overwritten
     records = [ConcreteRecord(name='aaa', age=i + 100) for i in range(10)]
     records = CsvSerializer.serialize_from_file(
         records,

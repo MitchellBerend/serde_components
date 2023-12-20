@@ -2,29 +2,22 @@
 import ast
 import io
 import sys
-from typing import TypeVar
+from typing import Type, Union
 
 import pytest
 
 from serde_components.mappers import BaseMapper
 from serde_components.serializers import TomlSerializer
 
+from .conftest import ConcreteRecord
 
-T = TypeVar('T')
-
-
-class ConcreteRecord:
-    def __init__(self, name=None, age=None):
-        self.name = name
-        self.age = age
-
-    def __eq__(self, other) -> bool:
-        return self.age == other.age and self.name == other.name
+Alias = Union[ConcreteRecord, Type[ConcreteRecord]]
 
 
 class Mapper(BaseMapper[ConcreteRecord]):
     @staticmethod
-    def map_deserialize(record: ConcreteRecord) -> bytes:
+    def map_deserialize(record: Alias) -> bytes:
+        assert isinstance(record, ConcreteRecord)
         rv = {}
         if record.name:
             rv['name'] = record.name
@@ -34,7 +27,8 @@ class Mapper(BaseMapper[ConcreteRecord]):
         return str(rv).encode('utf-8')
 
     @staticmethod
-    def map_serialize(record: ConcreteRecord, data: bytes) -> ConcreteRecord:
+    def map_serialize(record: Alias, data: bytes) -> ConcreteRecord:
+        assert isinstance(record, ConcreteRecord)
         _data = ast.literal_eval(data.decode('utf-8'))
         age = _data.get('age')
         if isinstance(age, str):
@@ -49,9 +43,8 @@ class Mapper(BaseMapper[ConcreteRecord]):
         return record
 
 
-def test_general_mapper():
-    t = ConcreteRecord(name='testName', age=10)
-    data = ast.literal_eval(Mapper.map_deserialize(t).decode('utf-8'))
+def test_general_mapper(record):
+    data = ast.literal_eval(Mapper.map_deserialize(record).decode('utf-8'))
     golden_data = {
         'age': 10,
         'name': 'testName',
@@ -60,81 +53,98 @@ def test_general_mapper():
     assert data == golden_data
 
 
-def test_toml_deserializer():
-    t = ConcreteRecord(name='', age=0)
+def test_toml_deserializer(record):
     toml_data = b'age = 10\nname = "testName"\n'
     if sys.version_info.minor < 11:
         with pytest.raises(ImportError):
-            TomlSerializer.serialize(t, Mapper, toml_data)
+            TomlSerializer.serialize(record, Mapper, toml_data)
     else:
-        TomlSerializer.serialize(t, Mapper, toml_data)
+        TomlSerializer.serialize(record, Mapper, toml_data)
         golden_record = ConcreteRecord(name='testName', age=10)
 
-        assert t == golden_record
+        assert record == golden_record
 
 
-def test_toml_factory_deserializer():
+def test_toml_factory_deserializer(record):
     toml_data = b'age = 10\nname = "testName"\n'
     if sys.version_info.minor < 11:
         with pytest.raises(ImportError):
-            t = TomlSerializer.serialize(ConcreteRecord, Mapper, toml_data)
+            record = TomlSerializer.serialize(
+                ConcreteRecord,
+                Mapper,
+                toml_data,
+            )
     else:
-        t = TomlSerializer.serialize(ConcreteRecord, Mapper, toml_data)
+        record = TomlSerializer.serialize(
+            ConcreteRecord,
+            Mapper,
+            toml_data,
+        )
         golden_record = ConcreteRecord(name='testName', age=10)
 
-        assert t == golden_record
+        assert record == golden_record
 
 
-def test_toml_deserializer_from_filebuffer():
-    t = ConcreteRecord(name='', age=0)
+def test_toml_deserializer_from_filebuffer(record):
     file_object = io.BytesIO(b'age = 10\nname = "testName"\n')
     if sys.version_info.minor < 11:
         with pytest.raises(ImportError):
-            TomlSerializer.serialize_from_file(t, Mapper, file_object)
+            TomlSerializer.serialize_from_file(
+                record,
+                Mapper,
+                file_object,
+            )
     else:
-        TomlSerializer.serialize_from_file(t, Mapper, file_object)
+        TomlSerializer.serialize_from_file(record, Mapper, file_object)
         golden_record = ConcreteRecord(name='testName', age=10)
 
-        assert t == golden_record
+        assert record == golden_record
 
 
-def test_toml_serializer_actual_file1():
+def test_toml_serializer_actual_file1(record):
     with open('tests/data/toml/record1.toml', 'rb') as file_object:
-        record = ConcreteRecord(name='', age=0)
         if sys.version_info.minor < 11:
             with pytest.raises(ImportError):
                 TomlSerializer.serialize_from_file(
-                    record,
+                    ConcreteRecord,
                     Mapper,
                     file_object,
                 )
         else:
-            TomlSerializer.serialize_from_file(record, Mapper, file_object)
-        golden_record = ConcreteRecord(name='TestFileName', age=100)
+            TomlSerializer.serialize_from_file(
+                ConcreteRecord,
+                Mapper,
+                file_object,
+            )
+        golden_record = ConcreteRecord(name='testName', age=10)
 
-    assert record, golden_record
+    assert record == golden_record
 
 
 def test_toml_serializer_actual_file2():
     with open('tests/data/toml/record2.toml', 'rb') as file_object:
-        record = ConcreteRecord(name='', age=0)
         if sys.version_info.minor < 11:
             with pytest.raises(ImportError):
-                TomlSerializer.serialize_from_file(
-                    record,
+                record = TomlSerializer.serialize_from_file(
+                    ConcreteRecord,
                     Mapper,
                     file_object,
                 )
+            return
         else:
-            TomlSerializer.serialize_from_file(record, Mapper, file_object)
+            record = TomlSerializer.serialize_from_file(
+                ConcreteRecord,
+                Mapper,
+                file_object,
+            )
         golden_record = ConcreteRecord(name=None, age=None)
 
-    assert record, golden_record
+    assert record == golden_record
 
 
 def test_toml_serializer_actual_file3():
+    record = ConcreteRecord(name='test', age=123)
     with open('tests/data/toml/record3.toml', 'rb') as file_object:
-        record = ConcreteRecord(name='', age=0)
         if sys.version_info.minor < 11:
             with pytest.raises(ImportError):
                 TomlSerializer.serialize_from_file(
@@ -142,8 +152,13 @@ def test_toml_serializer_actual_file3():
                     Mapper,
                     file_object,
                 )
+            return
         else:
-            TomlSerializer.serialize_from_file(record, Mapper, file_object)
-        golden_record = ConcreteRecord(name=10, age='TestFileName')
+            TomlSerializer.serialize_from_file(
+                record,
+                Mapper,
+                file_object,
+            )
+        golden_record = ConcreteRecord(name=10, age='testName')
 
-    assert record, golden_record
+    assert record == golden_record
